@@ -36,7 +36,7 @@ String colourMood;
 
 void setup()
 {
-  size(200,200);
+  size(400,400);
   
   minim = new Minim(this);
   
@@ -67,52 +67,58 @@ void setup()
 void draw()
 { 
   background(0.5);
+  
+  fill(255,255,255);
   textSize(20);
   text("Fade: ",20,20);
   text(fade,20,40);
   text("Level: ",20,60);
   text(levelPart,20,80);
   
+  fill(driver.r, driver.g, driver.b);
+  rect(200,200,100,100);
+  
   if (follow) {
-  // Fade out
-  kickSize = (int) constrain(kickSize * fade, MIN_AMP, MAX_AMP);
-  snareSize = (int) constrain(snareSize * fade, MIN_AMP, MAX_AMP);
-  hatSize = (int) constrain(hatSize * fade, MIN_AMP, MAX_AMP);
-  
-  // Get sound level
-  level = in.mix.level() * levelPart + (1 - levelPart);
-  //level = 1;
-  
-  // Set beats  
-  if ( beat.isKick()  ) kickSize  = level * KICK  * MAX_AMP;
-  if ( beat.isSnare() ) snareSize = level * SNARE * MAX_AMP;
-  if ( beat.isHat()   ) hatSize   = level * HAT   * MAX_AMP;
-  
-  if (!kickMode) { 
-    // DioderDriver
-    driver.r = (int) kickSize;
-    driver.g = (int) snareSize;
-    driver.b = (int) hatSize;
-    driver.update();
-  } else {
-    if (colourMood == "red") {
-        driver.r = (int) kickSize;
+    // Fade out
+    kickSize = (int) constrain(kickSize * fade, MIN_AMP, MAX_AMP);
+    snareSize = (int) constrain(snareSize * fade, MIN_AMP, MAX_AMP);
+    hatSize = (int) constrain(hatSize * fade, MIN_AMP, MAX_AMP);
+    
+    // Get sound level
+    level = in.mix.level() * levelPart + (1 - levelPart);
+    //level = 1;
+    
+    // Set beats  
+    if ( beat.isKick()  ) kickSize  = level * KICK  * MAX_AMP;
+    if ( beat.isSnare() ) snareSize = level * SNARE * MAX_AMP;
+    if ( beat.isHat()   ) hatSize   = level * HAT   * MAX_AMP;
+    
+    if (!kickMode) { 
+      // DioderDriver
+      driver.r = (int) kickSize;
+      driver.g = (int) snareSize;
+      driver.b = (int) hatSize;
+    } else {
+      if (colourMood == "red") {
+          driver.r = (int) kickSize;
+          driver.g = 0;
+          driver.b = 0;
+      }
+      if (colourMood == "green") {
+        driver.r = (int) 0;
+        driver.g = (int) kickSize;
+        driver.b = (int) 0;
+      }   
+      if (colourMood == "blue") {
+        driver.r = 0;
         driver.g = 0;
-        driver.b = 0;
-    }
-    if (colourMood == "green") {
-      driver.r = (int) 0;
-      driver.g = (int) kickSize;
-      driver.b = (int) 0;
-    }   
-    if (colourMood == "blue") {
-      driver.r = 0;
-      driver.g = 0;
-      driver.b = (int) kickSize;
+        driver.b = (int) kickSize;
+      }
     }
     driver.update();
   }
-  }
+
+  
 }
 
 void stop()
@@ -126,28 +132,28 @@ void stop()
 }
 
 void keyPressed() {
-  if (key == 44) {
+  if (key == 44) { //,
       follow = false;
       driver.r = MAX_AMP;
       driver.g = 0;
       driver.b = 0;
       driver.update();
   }
-  if (key == 46) {
+  if (key == 46) { //.
       follow = false;
       driver.r = 0;
       driver.g = MAX_AMP;
       driver.b = 0;
       driver.update();
   }
-  if (key == 45) { 
+  if (key == 45) { //-
       follow = false;
       driver.r = 0;
       driver.g = 0;
       driver.b = MAX_AMP;
       driver.update();
     }
-  if (key == 8) {
+  if (key == 8) { // Backsapce
     if (follow) {
       follow = false;
       driver.r = 0;
@@ -158,7 +164,7 @@ void keyPressed() {
       follow = true;
     }
     }
-  if (key == 10) {
+  if (key == 10) { // Enter
       follow = false;
       driver.r = 255;
       driver.g = 255;
@@ -186,10 +192,10 @@ void keyPressed() {
   if (key == 97) {  //a
     kickMode = false;
   }
-  if (key == 122) {
+  if (key == 122) { //z
     if(levelPart > 0) levelPart = levelPart - 0.1;
   }
-  if (key == 120) {
+  if (key == 120) { //x
     if(levelPart < 1) levelPart = levelPart + 0.1;
   }
 }
