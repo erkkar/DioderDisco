@@ -12,9 +12,13 @@ class DioderDriver {
     g = 0;
     b = 0;
     
-    if (!dummyMode) {
+    try {
       String portName = Serial.list()[0];
+      println(portName);
       serial = new Serial(parent, portName, 9600);
+    } catch (Exception e) {   //gnu.io.PortInUse
+      println("Dummy mode, no serial port in use!");
+      dummyMode = true;
     }
   }
   
