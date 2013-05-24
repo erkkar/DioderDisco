@@ -12,7 +12,7 @@ AudioPlayer  in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
-LightThing lt;
+LightThing[] lts;
 
 float kickSize, snareSize, hatSize;
 
@@ -35,9 +35,12 @@ boolean follow = true;
 boolean kickMode = false;
 String colourMood;
 
+static int LIGHT_THINGS = 3;
 
 void setup()
 {
+  colorMode(HSB, 255);
+  
   size(400,400);
   
   minim = new Minim(this);
@@ -68,7 +71,16 @@ void setup()
   driver = new DioderDriver(this);
   
   // Init LightThings
-  lt = new LightThing(0);
+  lts = new LightThing[LIGHT_THINGS];
+  
+  lts[0] = new KickThing();
+  lts[1] = new SnareThing();
+  lts[2] = new HatThing();
+  
+  lts[0].setup(1, 0.9, MIN_AMP, MAX_AMP);
+  lts[1].setup(1, 0.9, MIN_AMP, MAX_AMP);
+  lts[2].setup(1, 0.9, MIN_AMP, MAX_AMP);
+  
 }
 
 void draw()
@@ -87,24 +99,20 @@ void draw()
   
   if (follow) {
     // Fade out
-    kickSize = (int) constrain(kickSize * fade, MIN_AMP, MAX_AMP);
-    snareSize = (int) constrain(snareSize * fade, MIN_AMP, MAX_AMP);
-    hatSize = (int) constrain(hatSize * fade, MIN_AMP, MAX_AMP);
+    for (int i = 0; i < LIGHT_THINGS; i++) {
+      lts[i].fade();
+      lts[i].update();
+    }
     
     // Get sound level
     level = in.mix.level() * levelPart + (1 - levelPart);
     //level = 1;
     
-    // Set beats  
-    if ( beat.isKick()  ) kickSize  = level * KICK  * MAX_AMP;
-    if ( beat.isSnare() ) snareSize = level * SNARE * MAX_AMP;
-    if ( beat.isHat()   ) hatSize   = level * HAT   * MAX_AMP;
-    
     if (!kickMode) { 
       // DioderDriver
-      driver.r = (int) kickSize;
-      driver.g = (int) snareSize;
-      driver.b = (int) hatSize;
+      driver.r = (int) lts[0].size;
+      driver.g = (int) lts[1].size;
+      driver.b = (int) lts[2].size;
     } else {
       if (colourMood == "red") {
           driver.r = (int) kickSize;

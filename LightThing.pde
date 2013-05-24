@@ -1,9 +1,61 @@
 class LightThing 
 {
-  private int type; 
+  float size;
+  float fader;
+  int minSize, maxSize;
+  int hue;
   
-  LightThing(int type) 
+  // Constructor
+  LightThing() 
+  {
+    
+  }
+  
+  void setup(int hue, float fader, int minSize, int maxSize) 
   { 
-    this.type = type;
+    this.hue = hue;
+    this.fader = fader;
+    this.minSize = minSize;
+    this.maxSize = maxSize;
+  }
+  
+  // Fader
+  void fade() 
+  {
+    size = (int) constrain(size * fader, minSize, maxSize); 
+  }
+  
+  // Updater
+  void update() 
+  {
+    fade();
+  }
+}
+
+
+class KickThing extends LightThing
+{ 
+  void update()
+  {
+    super.fade();
+    if ( beat.isKick() ) size  = maxSize;
+  }
+}
+
+class SnareThing extends LightThing
+{
+  void update()
+  {
+    super.fade();
+    if ( beat.isSnare() ) size  = maxSize;
+  }
+}
+
+class HatThing extends LightThing
+{
+  void update()
+  {
+    super.fade();
+    if ( beat.isHat() ) size  = maxSize;
   }
 }
