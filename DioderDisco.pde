@@ -12,6 +12,7 @@ AudioPlayer  in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
+LightThing lt;
 
 float kickSize, snareSize, hatSize;
 
@@ -65,6 +66,9 @@ void setup()
   
   // Init Dioder driver
   driver = new DioderDriver(this);
+  
+  // Init LightThings
+  lt = new LightThing(0);
 }
 
 void draw()
