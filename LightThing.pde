@@ -4,30 +4,36 @@ class LightThing
   int hue;
   float saturation;
   float brightness;
-  int minB, maxB;
+  float minB, maxB;
   
   // Constructor
   LightThing() 
   {
-    saturation = 100;
-    brightness = 100;
+    saturation = 1;
+    brightness = maxB;
   }
   
-  void setup(int hue, float fader, int minB, int maxB) { 
+  void setup(int hue, float fader, float minB, float maxB) { 
     this.hue = hue;
     this.fader = fader;
     this.minB = minB;
     this.maxB = maxB;
   }
   
+  
+  
   // Fader
   void fade() {
-    brightness = (int) constrain(brightness * fader, minB, maxB); 
+    brightness = constrain(brightness * fader, minB, maxB); 
+  }
+  
+  // Beat
+  void beat(float level) {
+    brightness  = maxB * level; 
   }
   
   // Updater
-  void update(float level) {
-    saturation = level * 100;
+  void update(float level) { 
   }
   
   // Get color
@@ -40,23 +46,23 @@ class LightThing
 class KickThing extends LightThing
 { 
   void update(float level) {
-    super.update(level);
-    if ( beat.isKick() ) brightness  = maxB;
+    if ( beat.isKick() ) { super.beat(level);
+    } else {super.fade();}
   }
 }
 
 class SnareThing extends LightThing
 {
   void update(float level) {
-    super.update(level);
-    if ( beat.isSnare() ) brightness  = maxB;
+    if ( beat.isSnare() ) {super.beat(level);
+    } else {super.fade();}
   }
 }
 
 class HatThing extends LightThing 
 {
   void update(float level) {
-    super.update(level);
-    if ( beat.isHat() ) brightness  = maxB;
+    if ( beat.isHat() ) {super.beat(level);
+    } else {super.fade();}
   }
 }

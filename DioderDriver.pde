@@ -29,4 +29,13 @@ class DioderDriver {
       serial.write(b);
     }
   }
+  
+  void setColor(color c) {
+    r = (int) (c >> 16) & 0xFF;  // Faster way of getting red(c)
+    g = (int) (c >> 8) & 0xFF;   // Faster way of getting green(c)
+    b = (int) c & 0xFF;          // Faster way of getting blue(c)
+  }
+  
+  
+
 };
