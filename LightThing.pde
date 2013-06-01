@@ -1,61 +1,62 @@
 class LightThing 
 {
-  float size;
   float fader;
-  int minSize, maxSize;
   int hue;
+  float saturation;
+  float brightness;
+  int minB, maxB;
   
   // Constructor
   LightThing() 
   {
-    
+    saturation = 100;
+    brightness = 100;
   }
   
-  void setup(int hue, float fader, int minSize, int maxSize) 
-  { 
+  void setup(int hue, float fader, int minB, int maxB) { 
     this.hue = hue;
     this.fader = fader;
-    this.minSize = minSize;
-    this.maxSize = maxSize;
+    this.minB = minB;
+    this.maxB = maxB;
   }
   
   // Fader
-  void fade() 
-  {
-    size = (int) constrain(size * fader, minSize, maxSize); 
+  void fade() {
+    brightness = (int) constrain(brightness * fader, minB, maxB); 
   }
   
   // Updater
-  void update() 
-  {
-    fade();
+  void update(float level) {
+    saturation = level * 100;
+  }
+  
+  // Get color
+  color getColor() {
+    return color(hue, saturation, brightness);
   }
 }
 
 
 class KickThing extends LightThing
 { 
-  void update()
-  {
-    super.fade();
-    if ( beat.isKick() ) size  = maxSize;
+  void update(float level) {
+    super.update(level);
+    if ( beat.isKick() ) brightness  = maxB;
   }
 }
 
 class SnareThing extends LightThing
 {
-  void update()
-  {
-    super.fade();
-    if ( beat.isSnare() ) size  = maxSize;
+  void update(float level) {
+    super.update(level);
+    if ( beat.isSnare() ) brightness  = maxB;
   }
 }
 
-class HatThing extends LightThing
+class HatThing extends LightThing 
 {
-  void update()
-  {
-    super.fade();
-    if ( beat.isHat() ) size  = maxSize;
+  void update(float level) {
+    super.update(level);
+    if ( beat.isHat() ) brightness  = maxB;
   }
 }

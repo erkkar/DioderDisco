@@ -37,9 +37,12 @@ String colourMood;
 
 static int LIGHT_THINGS = 3;
 
+color masterColor;
+
 void setup()
 {
-  colorMode(HSB, 255);
+  colorMode(HSB);
+  masterColor = color(0,0,0);
   
   size(400,400);
   
@@ -94,25 +97,39 @@ void draw()
   text("Level: ",20,60);
   text(levelPart,20,80);
   
-  fill(driver.r, driver.g, driver.b);
+  fill(masterColor);
   rect(200,200,100,100);
   
   if (follow) {
-    // Fade out
-    for (int i = 0; i < LIGHT_THINGS; i++) {
-      lts[i].fade();
-      lts[i].update();
-    }
-    
+  
     // Get sound level
     level = in.mix.level() * levelPart + (1 - levelPart);
     //level = 1;
     
+    // Fade out
+    for (int i = 0; i < LIGHT_THINGS; i++) {
+      lts[i].fade();
+      lts[i].update(level);
+    }
+    
+    // Mix master color
+    masterColor = lts[0].getColor();
+    if (LIGHT_THINGS > 1) { 
+        for (int i = 1; i < LIGHT_THINGS; i++) {
+            masterColor = lerpColor(masterColor, lts[i].getColor(), 0.5);
+        }
+    }
+    
+    
+        
+    
+    
+    
     if (!kickMode) { 
       // DioderDriver
-      driver.r = (int) lts[0].size;
-      driver.g = (int) lts[1].size;
-      driver.b = (int) lts[2].size;
+      //driver.r = (int) lts[0].size;
+      //driver.g = (int) lts[1].size;
+      //driver.b = (int) lts[2].size;
     } else {
       if (colourMood == "red") {
           driver.r = (int) kickSize;
