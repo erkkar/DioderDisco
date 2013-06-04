@@ -1,0 +1,5 @@
+Arduino and Processing <http://playground.arduino.cc/Interfacing/Processing>
+
+GUI: controlP5 <http://www.sojamo.de/libraries/controlP5/>
+
+Minim <http://code.compartmental.net/tools/minim/>
