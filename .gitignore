@@ -1,6 +1,5 @@
-*.class
+# Buid directories
+application.*/*
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Data directory
+data/*
