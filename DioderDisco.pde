@@ -21,8 +21,6 @@ float level;
 float levelPart = 0.5;
 
 boolean follow = true;
-boolean kickMode = false;
-String colourMood;
 
 static int LIGHT_THINGS = 3;
 
@@ -33,7 +31,7 @@ static color WHITE, BLACK, RED, GREEN, BLUE;
 static int MAX_AMP = 1;
 
 
-
+// setup
 void setup()
 {
   colorMode(HSB, 359, 1, 1);
@@ -66,7 +64,7 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity(100);  
+  beat.setSensitivity(10);  
   
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
@@ -90,6 +88,8 @@ void setup()
   //=================================
 }
 
+
+// draw
 void draw()
 { 
   background(0.5);
@@ -100,7 +100,7 @@ void draw()
   text(levelPart,20,80);
   
   fill(masterColor);
-  rect(200,200,100,100);
+  //rect(200,200,100,100);
   
   if (follow) {
   
@@ -121,42 +121,13 @@ void draw()
         }
     }
     
-    if (!kickMode) { 
-      // DioderDriver
-      driver.setColor(masterColor);
-    } else {
-      if (colourMood == "red") {
-          driver.r = (int) kickSize;
-          driver.g = 0;
-          driver.b = 0;
-      }
-      if (colourMood == "green") {
-        driver.r = (int) 0;
-        driver.g = (int) kickSize;
-        driver.b = (int) 0;
-      }   
-      if (colourMood == "blue") {
-        driver.r = 0;
-        driver.g = 0;
-        driver.b = (int) kickSize;
-      }
-    }
-    driver.update();
+    // DioderDriver
+    driver.setColor(masterColor);
   }
-
-  
 }
 
-void stop()
-{
-  // always close Minim audio classes when you are finished with them
-  in.close();
-  // always stop Minim before exiting
-  minim.stop();
-  // this closes the sketch
-  super.stop();
-}
 
+// keyPressed
 void keyPressed() {
   if (key == 44) { //,
       follow = false;
@@ -183,31 +154,36 @@ void keyPressed() {
       masterColor = WHITE;
   }       
   if (key == 114) {  //r
-    kickMode = true;
-    colourMood = "red";
   }
   if (key == 103) {  //g
-    kickMode = true;
-    colourMood = "green";
   }
   if (key == 98) {  //b
-    kickMode = true;
-    colourMood = "blue";
   }
   if (key == 97) {  //a
-    kickMode = false;
   }
   if (key == 122) { //z
     if(levelPart > 0.1) levelPart = levelPart - 0.1;
   }
   if (key == 120) { //x
     if(levelPart < 1) levelPart = levelPart + 0.1;
-  }
-  
+  } 
   driver.setColor(masterColor);
-  driver.update();
 }
 
+
+// keyReleased
 void keyReleased() { 
   if (key != 8) follow = true;
+}
+
+
+// stop
+void stop()
+{
+  // always close Minim audio classes when you are finished with them
+  in.close();
+  // always stop Minim before exiting
+  minim.stop();
+  // this closes the sketch
+  super.stop();
 }
