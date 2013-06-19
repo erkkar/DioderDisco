@@ -43,6 +43,7 @@ class LightThing
 }
 
 
+// KickThing
 class KickThing extends LightThing
 { 
   void update(float level) {
@@ -51,6 +52,8 @@ class KickThing extends LightThing
   }
 }
 
+
+//SanreThing
 class SnareThing extends LightThing
 {
   void update(float level) {
@@ -59,6 +62,8 @@ class SnareThing extends LightThing
   }
 }
 
+
+// HatThing
 class HatThing extends LightThing 
 {
   void update(float level) {
