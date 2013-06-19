@@ -23,7 +23,10 @@ boolean follow = true;
 static int LIGHT_THINGS = 3;
 int PARAMETERS = 1;
 
+int activeLTs;
+
 color masterColor;
+float totalR, totalG, totalB;
 
 static color WHITE, BLACK, RED, GREEN, BLUE;
 
@@ -44,9 +47,11 @@ void setup()
   // Define static colors
   WHITE = color(255, 255, 255);
   BLACK = color(0, 0, 0);
-  RED = color(255, 255, 255);
-  GREEN = color(0, 255, 255);
+  RED = color(255, 0, 0);
+  GREEN = color(0, 255, 0);
   BLUE = color(0, 0, 255);
+  
+  masterColor = BLACK;
   
   size(400,400);
   
@@ -94,7 +99,7 @@ void setup()
   
   lts[2] = new HatThing(); 
   lts[2].fader = 0.5;
-  lts[2].setColor(0, 0, 255, 0.5);
+  lts[2].setColor(0, 0, 128);
   lts[2].comment = "Hat";
 
   //=================================
@@ -105,8 +110,6 @@ void setup()
 void draw()
 { 
   background(0.5);
-  
-  masterColor = BLACK;
   
   fill(WHITE);
   textSize(TEXT_SIZE);
@@ -125,20 +128,23 @@ void draw()
     }
     
     // Mix master color
-    if (lts[0].enabled) { 
-      masterColor = lts[0].getColor();
-    } else { 
-      masterColor = BLACK; 
+    totalR = 0; totalG = 0; totalB = 0; activeLTs = 0;
+    for (LightThing lt : lts) {
+      if (lt.enabled) {
+        activeLTs++; 
+        totalR = totalR + lt.r;
+        totalG = totalG + lt.g;
+        totalB = totalB + lt.b;
+      }
     }
-    if (LIGHT_THINGS > 1) { 
-        for (int i = 1; i < LIGHT_THINGS; i++) {
-          if (lts[i].enabled) masterColor = lerpColor(masterColor, lts[i].getColor(), 0.5);
-        }
-    }
-    
+    totalR = totalR / activeLTs;
+    totalG = totalG / activeLTs;
+    totalB = totalB / activeLTs;  
+    masterColor = color(totalR, totalG, totalB);
   }
+  
   // DioderDriver
-  driver.setColor(masterColor);
+  driver.update(masterColor);
 }
 
 
