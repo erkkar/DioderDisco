@@ -39,16 +39,14 @@ static int TEXT_SIZE = 20;
 // setup
 void setup()
 {
-  colorMode(HSB, 360, 100, 100);
+  colorMode(RGB);
   
   // Define static colors
-  WHITE = color(0, 0, 100);
+  WHITE = color(255, 255, 255);
   BLACK = color(0, 0, 0);
-  RED = color(0, 100, 100);
-  GREEN = color(119, 100, 100);
-  BLUE = color(239, 100, 100);
-  
-  masterColor = BLACK;
+  RED = color(255, 255, 255);
+  GREEN = color(0, 255, 255);
+  BLUE = color(0, 0, 255);
   
   size(400,400);
   
@@ -85,15 +83,18 @@ void setup()
   lts = new LightThing[LIGHT_THINGS];
   
   lts[0] = new KickThing();
-  lts[0].setup(0, 0.9, 0, 100);
+  lts[0].fader = 0.9;
+  lts[0].setColor(255, 0, 0);
   lts[0].comment = "Kick";
   
   lts[1] = new SnareThing();
-  lts[1].setup(119, 0.5, 0, 0);
+  lts[1].fader = 0.5;
+  lts[1].setColor(0, 255, 0);
   lts[1].comment = "Snare";
   
   lts[2] = new HatThing(); 
-  lts[2].setup(239, 0.5, 0, 50);
+  lts[2].fader = 0.5;
+  lts[2].setColor(0, 0, 255, 0.5);
   lts[2].comment = "Hat";
 
   //=================================
@@ -104,6 +105,8 @@ void setup()
 void draw()
 { 
   background(0.5);
+  
+  masterColor = BLACK;
   
   fill(WHITE);
   textSize(TEXT_SIZE);

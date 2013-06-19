@@ -1,38 +1,43 @@
 class LightThing 
 {
   float fader;
-  int hue;
-  float saturation;
-  float brightness;
-  float minB, maxB;
   boolean enabled;
   String comment;
+  
+  float r, g, b;
+  float R, G, B;
   
   // Constructor
   LightThing() 
   {
-    saturation = 100;
-    brightness = maxB;
     enabled = true;
   }
   
-  void setup(int hue, float fader, float minB, float maxB) { 
-    this.hue = hue;
-    this.fader = fader;
-    this.minB = minB;
-    this.maxB = maxB;
+  void setColor(float red, float green, float blue ) {
+     R = red; G = green; B = blue;
+     r = R; g = G; b = B;
   }
   
+  void setColor(int red, int green, int blue, float scale) {
+     setColor(red * scale, green * scale,  blue * scale);
+  }
   
+
   
   // Fader
   void fade() {
-    brightness = constrain(brightness * fader, minB, maxB); 
+    r = constrain(r * fader, 0, 255); 
+    g = constrain(g * fader, 0, 255); 
+    b = constrain(b * fader, 0, 255); 
   }
   
   // Beat
   void beat(float level) {
-    if (enabled) brightness  = maxB * level; 
+    if (enabled) {
+      r = R * level;
+      g = G * level;
+      b = B * level;
+    }
   }
   
   // Updater
@@ -41,12 +46,12 @@ class LightThing
   
   // Get color
   color getColor() {
-    return color(hue, saturation, brightness);
+    return color(r, g, b);
   }
   
   // Get original color
   color getOrigColor() {
-    return color(hue, 100, 100);
+    return color(R, G, B);
   }
   
   // Switch
