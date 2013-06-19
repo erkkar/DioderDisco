@@ -24,11 +24,11 @@ boolean follow = true;
 boolean kickMode = false;
 String colourMood;
 
-static int LIGHT_THINGS = 1;
+static int LIGHT_THINGS = 3;
 
 color masterColor;
 
-color white;
+static color WHITE, BLACK, RED, GREEN, BLUE;
 
 static int MAX_AMP = 1;
 
@@ -39,7 +39,13 @@ void setup()
   colorMode(HSB, 359, 1, 1);
   
   masterColor = color(0,0,0);
-  white = color(0, 0, 1);
+  
+  // Define static colors
+  WHITE = color(0, 0, 1);
+  BLACK = color(0, 0, 0);
+  RED = color(0, 1, 1);
+  GREEN = color(119, 1, 1);
+  BLUE = color(239, 1, 1);
   
   size(400,400);
   
@@ -60,7 +66,7 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity(300);  
+  beat.setSensitivity(100);  
   
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
@@ -69,24 +75,26 @@ void setup()
   // Init Dioder driver
   driver = new DioderDriver(this);
   
+  //=================================
   // Init LightThings
   lts = new LightThing[LIGHT_THINGS];
   
-  lts[0] = new KickThing();
-  //lts[1] = new SnareThing();
-  //lts[2] = new HatThing();
+  lts[2] = new KickThing();
+  lts[2].setup(0, 0.9, 0, 1);
   
-  lts[0].setup(0, 0.9, 0, 1);
-  //lts[1].setup(115, 0.5, 0, 1);
-  //lts[2].setup(226, 0.9, 0, 1);
+  lts[1] = new SnareThing();
+  lts[1].setup(119, 0.5, 0, 0.1);
   
+  lts[0] = new HatThing(); 
+  lts[0].setup(239, 0.5, 0, 0.1);
+  //=================================
 }
 
 void draw()
 { 
   background(0.5);
   
-  fill(white);
+  fill(WHITE);
   textSize(20);
   text("Level: ",20,60);
   text(levelPart,20,80);
@@ -152,42 +160,27 @@ void stop()
 void keyPressed() {
   if (key == 44) { //,
       follow = false;
-      driver.r = MAX_AMP;
-      driver.g = 0;
-      driver.b = 0;
-      driver.update();
+      masterColor = RED;
   }
   if (key == 46) { //.
       follow = false;
-      driver.r = 0;
-      driver.g = MAX_AMP;
-      driver.b = 0;
-      driver.update();
+      masterColor = GREEN;
   }
   if (key == 45) { //-
       follow = false;
-      driver.r = 0;
-      driver.g = 0;
-      driver.b = MAX_AMP;
-      driver.update();
-    }
+      masterColor = BLUE;
+  }
   if (key == 8) { // Backsapce
     if (follow) {
       follow = false;
-      driver.r = 0;
-      driver.g = 0;
-      driver.b = 0;
-      driver.update();
+      masterColor = BLACK;
     } else { 
       follow = true;
     }
-    }
+  }
   if (key == 10) { // Enter
       follow = false;
-      driver.r = 255;
-      driver.g = 255;
-      driver.b = 255;
-      driver.update();
+      masterColor = WHITE;
   }       
   if (key == 114) {  //r
     kickMode = true;
@@ -210,6 +203,9 @@ void keyPressed() {
   if (key == 120) { //x
     if(levelPart < 1) levelPart = levelPart + 0.1;
   }
+  
+  driver.setColor(masterColor);
+  driver.update();
 }
 
 void keyReleased() { 
