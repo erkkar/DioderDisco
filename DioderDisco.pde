@@ -14,8 +14,6 @@ BeatListener bl;
 DioderDriver driver;
 LightThing[] lts;
 
-float kickSize, snareSize, hatSize;
-
 // Sound volume
 float level;
 float levelPart = 0.5;
@@ -23,27 +21,34 @@ float levelPart = 0.5;
 boolean follow = true;
 
 static int LIGHT_THINGS = 3;
+int PARAMETERS = 1;
 
 color masterColor;
 
 static color WHITE, BLACK, RED, GREEN, BLUE;
 
-static int MAX_AMP = 1;
+String[] parameters;
+float[] values;
+
+static int WIDTH = 400;
+static int HEIGHT = 400;
+static int MARGIN = 20;
+static int TEXT_SIZE = 20;
 
 
 // setup
 void setup()
 {
-  colorMode(HSB, 359, 1, 1);
-  
-  masterColor = color(0,0,0);
+  colorMode(HSB, 360, 100, 100);
   
   // Define static colors
-  WHITE = color(0, 0, 1);
+  WHITE = color(0, 0, 100);
   BLACK = color(0, 0, 0);
-  RED = color(0, 1, 1);
-  GREEN = color(119, 1, 1);
-  BLUE = color(239, 1, 1);
+  RED = color(0, 100, 100);
+  GREEN = color(119, 100, 100);
+  BLUE = color(239, 100, 100);
+  
+  masterColor = BLACK;
   
   size(400,400);
   
@@ -66,25 +71,31 @@ void setup()
   // an error will be reported and it will be set to 10 instead. 
   beat.setSensitivity(10);  
   
-  
   // make a new beat listener, so that we won't miss any buffers for the analysis
   bl = new BeatListener(beat, in);  
   
   // Init Dioder driver
   driver = new DioderDriver(this);
   
+  parameters = new String[PARAMETERS];
+  values = new float[PARAMETERS];
+  
   //=================================
   // Init LightThings
   lts = new LightThing[LIGHT_THINGS];
   
-  lts[2] = new KickThing();
-  lts[2].setup(0, 0.9, 0, 1);
+  lts[0] = new KickThing();
+  lts[0].setup(0, 0.9, 0, 100);
+  lts[0].comment = "Kick";
   
   lts[1] = new SnareThing();
-  lts[1].setup(119, 0.5, 0, 0.1);
+  lts[1].setup(119, 0.5, 0, 0);
+  lts[1].comment = "Snare";
   
-  lts[0] = new HatThing(); 
-  lts[0].setup(239, 0.5, 0, 0.1);
+  lts[2] = new HatThing(); 
+  lts[2].setup(239, 0.5, 0, 50);
+  lts[2].comment = "Hat";
+
   //=================================
 }
 
@@ -95,12 +106,9 @@ void draw()
   background(0.5);
   
   fill(WHITE);
-  textSize(20);
-  text("Level: ",20,60);
-  text(levelPart,20,80);
-  
-  fill(masterColor);
-  //rect(200,200,100,100);
+  textSize(TEXT_SIZE);
+  printParameters();
+  printThings();
   
   if (follow) {
   
@@ -114,21 +122,26 @@ void draw()
     }
     
     // Mix master color
-    masterColor = lts[0].getColor();
+    if (lts[0].enabled) { 
+      masterColor = lts[0].getColor();
+    } else { 
+      masterColor = BLACK; 
+    }
     if (LIGHT_THINGS > 1) { 
         for (int i = 1; i < LIGHT_THINGS; i++) {
-            masterColor = lerpColor(masterColor, lts[i].getColor(), 0.5);
+          if (lts[i].enabled) masterColor = lerpColor(masterColor, lts[i].getColor(), 0.5);
         }
     }
     
-    // DioderDriver
-    driver.setColor(masterColor);
   }
+  // DioderDriver
+  driver.setColor(masterColor);
 }
 
 
 // keyPressed
 void keyPressed() {
+  
   if (key == 44) { //,
       follow = false;
       masterColor = RED;
@@ -165,9 +178,24 @@ void keyPressed() {
     if(levelPart > 0.1) levelPart = levelPart - 0.1;
   }
   if (key == 120) { //x
-    if(levelPart < 1) levelPart = levelPart + 0.1;
+    if(levelPart < 1.0) levelPart = levelPart + 0.1;
   } 
-  driver.setColor(masterColor);
+  
+  // Switch LightThings on/off
+  if (key == 48) { //0
+      for (LightThing lt : lts) { 
+        lt.enabled = true;
+      }
+  }
+  if (key == 49) { //1
+      lts[0].flip();
+  }
+  if (key == 50) { //2
+      lts[1].flip();
+  }
+  if (key == 51) { //3
+      lts[2].flip();
+  }
 }
 
 
@@ -175,6 +203,34 @@ void keyPressed() {
 void keyReleased() { 
   if (key != 8) follow = true;
 }
+
+
+// printParameters
+void printParameters() {
+  fill(WHITE);
+  textAlign(LEFT);
+  
+  parameters[0] = "Level";
+  values[0] = levelPart;
+  
+  for (int i = 0; i < PARAMETERS; i++) {
+    text(parameters[i] + ": ", MARGIN, MARGIN + i * 1.1 * TEXT_SIZE);
+    text(values[i], 100, MARGIN + i * TEXT_SIZE);
+  }
+}
+
+
+// printThings
+void printThings() {
+  textAlign(LEFT);
+  for (int i = 0; i < LIGHT_THINGS; i++) {
+    if (lts[i].enabled) { 
+      fill(lts[i].getOrigColor());
+      text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH / 2, MARGIN + i * 1.1 * TEXT_SIZE);
+    }
+  }
+}
+  
 
 
 // stop

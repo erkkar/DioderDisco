@@ -5,12 +5,15 @@ class LightThing
   float saturation;
   float brightness;
   float minB, maxB;
+  boolean enabled;
+  String comment;
   
   // Constructor
   LightThing() 
   {
-    saturation = 1;
+    saturation = 100;
     brightness = maxB;
+    enabled = true;
   }
   
   void setup(int hue, float fader, float minB, float maxB) { 
@@ -29,7 +32,7 @@ class LightThing
   
   // Beat
   void beat(float level) {
-    brightness  = maxB * level; 
+    if (enabled) brightness  = maxB * level; 
   }
   
   // Updater
@@ -39,6 +42,16 @@ class LightThing
   // Get color
   color getColor() {
     return color(hue, saturation, brightness);
+  }
+  
+  // Get original color
+  color getOrigColor() {
+    return color(hue, 100, 100);
+  }
+  
+  // Switch
+  void flip() {
+    enabled = !enabled;
   }
 }
 
