@@ -89,8 +89,7 @@ void setup()
   // Init LightThings
   lts = new LightThing[LIGHT_THINGS];
   
-  LTconfig = createReader('LTs.cfg');
-  
+  LTconfig = createReader("LTs.cfg");
   
   
   lts[0] = new KickThing();
