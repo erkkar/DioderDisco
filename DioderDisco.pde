@@ -245,6 +245,9 @@ void printThings() {
 // stop
 void stop()
 {
+  // Switch lights off
+  driver.update(BLACK);
+  
   // always close Minim audio classes when you are finished with them
   in.close();
   // always stop Minim before exiting
