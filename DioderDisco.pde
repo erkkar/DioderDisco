@@ -38,6 +38,8 @@ static int HEIGHT = 400;
 static int MARGIN = 20;
 static int TEXT_SIZE = 20;
 
+BufferedReader LTconfig;
+
 
 // setup
 void setup()
@@ -86,6 +88,10 @@ void setup()
   //=================================
   // Init LightThings
   lts = new LightThing[LIGHT_THINGS];
+  
+  LTconfig = createReader('LTs.cfg');
+  
+  
   
   lts[0] = new KickThing();
   lts[0].fader = 0.9;
