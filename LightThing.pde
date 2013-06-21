@@ -8,9 +8,9 @@ class LightThing
   float R, G, B;
   
   // Constructor
-  LightThing() 
+  LightThing(boolean status) 
   {
-    enabled = true;
+    enabled = status;
   }
   
   void setColor(float red, float green, float blue ) {
@@ -64,6 +64,10 @@ class LightThing
 // KickThing
 class KickThing extends LightThing
 { 
+  KickThing() {
+    super(true);
+  }
+  
   void update(float level) {
     if ( beat.isKick() ) { super.beat(level);
     } else {super.fade();}
@@ -74,6 +78,10 @@ class KickThing extends LightThing
 //SanreThing
 class SnareThing extends LightThing
 {
+  SnareThing() {
+    super(true);
+  }
+  
   void update(float level) {
     if ( beat.isSnare() ) {super.beat(level);
     } else {super.fade();}
@@ -84,6 +92,10 @@ class SnareThing extends LightThing
 // HatThing
 class HatThing extends LightThing 
 {
+  HatThing() {
+    super(true);
+  }
+  
   void update(float level) {
     if ( beat.isHat() ) {super.beat(level);
     } else {super.fade();}

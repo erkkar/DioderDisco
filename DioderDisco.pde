@@ -20,7 +20,9 @@ float levelPart = 0.5;
 
 boolean follow = true;
 
-static int LIGHT_THINGS = 3;
+static int MAX_LIGHT_THINGS = 9;
+int lightThings;
+
 int PARAMETERS = 1;
 
 int activeLTs;
@@ -37,7 +39,9 @@ static int WIDTH = 400;
 static int HEIGHT = 400;
 static int MARGIN = 20;
 static int TEXT_SIZE = 20;
+static int RECT_SIZE = 100;
 
+String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
 
 
@@ -87,25 +91,13 @@ void setup()
   
   //=================================
   // Init LightThings
-  lts = new LightThing[LIGHT_THINGS];
+  lts = new LightThing[MAX_LIGHT_THINGS];
   
-  LTconfig = createReader("LTs.cfg");
+  for (int i = 0; i < MAX_LIGHT_THINGS; i++) {
+    lts[i] = new LightThing(false);
+  }
   
-  
-  lts[0] = new KickThing();
-  lts[0].fader = 0.9;
-  lts[0].setColor(255, 0, 0);
-  lts[0].comment = "Kick";
-  
-  lts[1] = new SnareThing();
-  lts[1].fader = 0.5;
-  lts[1].setColor(0, 255, 0);
-  lts[1].comment = "Snare";
-  
-  lts[2] = new HatThing(); 
-  lts[2].fader = 0.5;
-  lts[2].setColor(0, 0, 128);
-  lts[2].comment = "Hat";
+  readLTconfig(LT_CONFIG);
 
   //=================================
 }
@@ -121,6 +113,9 @@ void draw()
   printParameters();
   printThings();
   
+  fill(masterColor);
+  rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
+  
   if (follow) {
   
     // Get sound level
@@ -128,18 +123,18 @@ void draw()
     //level = 1;
     
     // Check beats
-    for (int i = 0; i < LIGHT_THINGS; i++) {
+    for (int i = 0; i < lightThings; i++) {
       lts[i].update(level);
     }
     
     // Mix master color
     totalR = 0; totalG = 0; totalB = 0; activeLTs = 0;
-    for (LightThing lt : lts) {
-      if (lt.enabled) {
+    for (int i = 0; i < lightThings; i++) {
+      if (lts[i].enabled) {
         activeLTs++; 
-        totalR = totalR + lt.r;
-        totalG = totalG + lt.g;
-        totalB = totalB + lt.b;
+        totalR = totalR + lts[i].r;
+        totalG = totalG + lts[i].g;
+        totalB = totalB + lts[i].b;
       }
     }
     totalR = totalR / activeLTs;
@@ -180,7 +175,9 @@ void keyPressed() {
       follow = false;
       masterColor = WHITE;
   }       
+  // Re-read light configuration
   if (key == 114) {  //r
+    readLTconfig(LT_CONFIG);
   }
   if (key == 103) {  //g
   }
@@ -210,6 +207,24 @@ void keyPressed() {
   if (key == 51) { //3
       lts[2].flip();
   }
+  if (key == 52) { //4
+      lts[3].flip();
+  }
+  if (key == 53) { //5
+      lts[4].flip();
+  }
+  if (key == 54) { //6
+      lts[5].flip();
+  }
+  if (key == 55) { //7
+      lts[6].flip();
+  }
+  if (key == 56) { //8
+      lts[7].flip();
+  }
+  if (key == 57) { //9
+      lts[8].flip();
+  }
 }
 
 
@@ -237,12 +252,49 @@ void printParameters() {
 // printThings
 void printThings() {
   textAlign(LEFT);
-  for (int i = 0; i < LIGHT_THINGS; i++) {
+  for (int i = 0; i < lightThings; i++) {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
       text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH / 2, MARGIN + i * 1.1 * TEXT_SIZE);
     }
   }
+}
+
+void readLTconfig(String filename) {
+  LTconfig = createReader(filename);
+  String line;
+  String[] config = new String[6];
+  for (int i = 0; i < MAX_LIGHT_THINGS; i++) {
+    try {
+      line = LTconfig.readLine();
+    } catch (IOException e) {
+      e.printStackTrace();
+      line = null;
+      break;
+    }
+    if (line.equals("")) break;
+    
+    config = splitTokens(line);
+    println(i);
+    switch(config[1].charAt(0)) {
+      case 'k':
+        lts[i] = new KickThing();
+        break;
+      case 's':
+        lts[i] = new SnareThing();
+        break;
+      case 'h':
+        lts[i] = new HatThing();
+        break;
+    }
+    
+    lts[i].comment = config[0];
+    lts[i].fader = float(config[2]);
+    lts[i].setColor(int(config[3]), int(config[4]), int(config[5]));
+    
+    lightThings = i + 1;
+  }
+  
 }
   
 
