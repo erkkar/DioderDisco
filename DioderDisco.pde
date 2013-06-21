@@ -23,7 +23,7 @@ boolean follow = true;
 static int MAX_LIGHT_THINGS = 9;
 int lightThings;
 
-int PARAMETERS = 1;
+int PARAMETERS = 2;
 
 int activeLTs;
 
@@ -43,6 +43,8 @@ static int RECT_SIZE = 100;
 
 String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
+
+int sensitivity = 10;
 
 
 // setup
@@ -78,7 +80,7 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity(10);  
+  beat.setSensitivity(sensitivity);  
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
   bl = new BeatListener(beat, in);  
@@ -180,8 +182,12 @@ void keyPressed() {
     readLTconfig(LT_CONFIG);
   }
   if (key == 103) {  //g
+    sensitivity = sensitivity + 10;
+    beat.setSensitivity(sensitivity);
   }
   if (key == 98) {  //b
+    if (sensitivity > 10) sensitivity = sensitivity - 10;
+    beat.setSensitivity(sensitivity); 
   }
   if (key == 97) {  //a
   }
@@ -191,6 +197,10 @@ void keyPressed() {
   if (key == 120) { //x
     if(levelPart < 1.0) levelPart = levelPart + 0.1;
   } 
+  
+ 
+   
+  
   
   // Switch LightThings on/off
   if (key == 48) { //0
@@ -242,9 +252,12 @@ void printParameters() {
   parameters[0] = "Level";
   values[0] = levelPart;
   
+  parameters[1] = "Sens.";
+  values[1] = sensitivity;
+  
   for (int i = 0; i < PARAMETERS; i++) {
-    text(parameters[i] + ": ", MARGIN, MARGIN + i * 1.1 * TEXT_SIZE);
-    text(values[i], 100, MARGIN + i * TEXT_SIZE);
+    text(parameters[i] + ": ", MARGIN, MARGIN + i * 1.2 * TEXT_SIZE);
+    text(values[i], 100, MARGIN + i * 1.2 * TEXT_SIZE);
   }
 }
 
@@ -275,7 +288,7 @@ void readLTconfig(String filename) {
     if (line.equals("")) break;
     
     config = splitTokens(line);
-    println(i);
+    
     switch(config[1].charAt(0)) {
       case 'k':
         lts[i] = new KickThing();
@@ -295,6 +308,8 @@ void readLTconfig(String filename) {
     lightThings = i + 1;
   }
   
+  println("Total Light Things read: " + lightThings);
+  
 }
   
 
@@ -302,6 +317,8 @@ void readLTconfig(String filename) {
 // stop
 void stop()
 {
+  print("Shutting down . . . ");
+  
   // Switch lights off
   driver.update(BLACK);
   
@@ -311,4 +328,6 @@ void stop()
   minim.stop();
   // this closes the sketch
   super.stop();
+  
+  print("done. Goodbye!");
 }
