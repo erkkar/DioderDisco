@@ -3,3 +3,11 @@ Arduino and Processing <http://playground.arduino.cc/Interfacing/Processing>
 GUI: controlP5 <http://www.sojamo.de/libraries/controlP5/>
 
 Minim <http://code.compartmental.net/tools/minim/>
+
+Ei vitussa mit‰‰n erilisi‰ olioita. Kaikki tyypit on samoja, mutta tyyppiparametri muttuu.
+
+Loperus pit‰‰ mietti‰, valot ei sammu.
+
+Efektivalot linkitetty tasoon.
+
+Pikavalinnoissa ei yksitt‰isi‰ valoja, vaan komboja. Mietityt v‰riyhdistelm‰t.		

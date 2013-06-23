@@ -44,7 +44,7 @@ static int RECT_SIZE = 100;
 String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
 
-int sensitivity = 10;
+int sensitivity = 100;
 
 
 // setup
@@ -80,7 +80,7 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity(sensitivity);  
+  beat.setSensitivity(sensitivity);
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
   bl = new BeatListener(beat, in);  
@@ -115,8 +115,8 @@ void draw()
   printParameters();
   printThings();
   
-  fill(masterColor);
-  rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
+  //fill(masterColor);
+  //rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
   
   if (follow) {
   
@@ -182,11 +182,13 @@ void keyPressed() {
     readLTconfig(LT_CONFIG);
   }
   if (key == 103) {  //g
-    sensitivity = sensitivity + 10;
+    if (sensitivity < 100) { sensitivity = 100;}
+    else {sensitivity = sensitivity + 100;}
     beat.setSensitivity(sensitivity);
   }
   if (key == 98) {  //b
-    if (sensitivity > 10) sensitivity = sensitivity - 10;
+    if (sensitivity > 100) { sensitivity = sensitivity - 100;}
+    else {sensitivity = 10;}
     beat.setSensitivity(sensitivity); 
   }
   if (key == 97) {  //a
@@ -198,14 +200,15 @@ void keyPressed() {
     if(levelPart < 1.0) levelPart = levelPart + 0.1;
   } 
   
- 
-   
-  
-  
   // Switch LightThings on/off
   if (key == 48) { //0
       for (LightThing lt : lts) { 
         lt.enabled = true;
+      }
+  }
+  if (key == 43) { //0
+      for (LightThing lt : lts) { 
+        lt.enabled = false;
       }
   }
   if (key == 49) { //1
