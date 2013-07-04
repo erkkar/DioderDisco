@@ -105,7 +105,7 @@ void setup()
 
   //=================================
 }
-
+// end of setup
 
 // draw
 void draw()
@@ -127,7 +127,7 @@ void draw()
     level = mixLevel * levelPart + (1 - levelPart);
     //level = 1;
     
-    // Check beats
+    // Update lights
     for (int i = 0; i < lightThings; i++) {
       lts[i].update(level);
     }
@@ -151,6 +151,7 @@ void draw()
   // DioderDriver
   driver.update(masterColor);
 }
+// end of draw
 
 
 // keyPressed
