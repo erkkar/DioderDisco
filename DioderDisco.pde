@@ -7,8 +7,8 @@ import ddf.minim.analysis.*;
 import processing.serial.*;
 
 Minim        minim;
-//AudioPlayer  in;
-AudioInput   in;
+AudioPlayer  in;
+//AudioInput   in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
@@ -67,9 +67,9 @@ void setup()
   
   minim = new Minim(this);
   
-  in = minim.getLineIn();
-  //in = minim.loadFile("sample.mp3");
-  //in.loop();
+  //in = minim.getLineIn();
+  in = minim.loadFile("sample.mp3");
+  in.loop();
   
   // a beat detection object that is FREQ_ENERGY mode that 
   // expects buffers the length of song's buffer size
@@ -129,7 +129,7 @@ void draw()
     
     // Update lights
     for (int i = 0; i < lightThings; i++) {
-      lts[i].update(level);
+      lts[i].update(mixLevel);
     }
     
     // Mix master color

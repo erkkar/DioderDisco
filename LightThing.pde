@@ -4,14 +4,15 @@ class LightThing
   boolean enabled;
   String comment;
   
-  float r, g, b;
-  float R, G, B;
+  float r, g, b; // current RGB values
+  float R, G, B; // RGB values of set color
   
   // Constructor
   LightThing(boolean status) 
   {
     enabled = status;
   }
+  
   
   void setColor(float red, float green, float blue ) {
      R = red; G = green; B = blue;
@@ -22,8 +23,6 @@ class LightThing
      setColor(red * scale, green * scale,  blue * scale);
   }
   
-
-  
   // Fader
   void fade() {
     r = constrain(r * fader, 0, 255); 
@@ -33,10 +32,10 @@ class LightThing
   
   // Beat
   void beat(float level) {
-    if (enabled) {
-      r = R * level;
-      g = G * level;
-      b = B * level;
+    if (enabled && level > LEVEL_THRESHOLD) {
+      r = R;
+      g = G;
+      b = B;
     }
   }
   
