@@ -16,32 +16,34 @@ LightThing[] lts;
 
 // Sound volume
 float level;
+float mixLevel;
 float levelPart = 0.5;
+final float LEVEL_THRESHOLD = 0.001;
 
 boolean follow = true;
 
-static int MAX_LIGHT_THINGS = 9;
+final static int MAX_LIGHT_THINGS = 9;
 int lightThings;
 
-int PARAMETERS = 2;
+final int PARAMETERS = 3;
 
 int activeLTs;
 
 color masterColor;
 float totalR, totalG, totalB;
 
-static color WHITE, BLACK, RED, GREEN, BLUE;
+color WHITE, BLACK, RED, GREEN, BLUE;
 
 String[] parameters;
 float[] values;
 
-static int WIDTH = 400;
-static int HEIGHT = 400;
-static int MARGIN = 20;
-static int TEXT_SIZE = 20;
-static int RECT_SIZE = 100;
+final int WIDTH = 400;
+final int HEIGHT = 400;
+final int MARGIN = 20;
+final int TEXT_SIZE = 20;
+final int RECT_SIZE = 100;
 
-String LT_CONFIG = "LTs.cfg";
+final String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
 
 int sensitivity = 100;
@@ -115,13 +117,14 @@ void draw()
   printParameters();
   printThings();
   
-  //fill(masterColor);
-  //rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
+  fill(masterColor);
+  rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
   
   if (follow) {
   
     // Get sound level
-    level = in.mix.level() * levelPart + (1 - levelPart);
+    mixLevel = in.mix.level();
+    level = mixLevel * levelPart + (1 - levelPart);
     //level = 1;
     
     // Check beats
@@ -252,11 +255,14 @@ void printParameters() {
   fill(WHITE);
   textAlign(LEFT);
   
-  parameters[0] = "Level";
+  parameters[0] = "levelPart";
   values[0] = levelPart;
   
   parameters[1] = "Sens.";
   values[1] = sensitivity;
+  
+  parameters[2] = "Level";
+  values[2] = mixLevel;
   
   for (int i = 0; i < PARAMETERS; i++) {
     text(parameters[i] + ": ", MARGIN, MARGIN + i * 1.2 * TEXT_SIZE);
