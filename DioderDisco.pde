@@ -25,7 +25,8 @@ boolean follow = true;
 final static int MAX_LIGHT_THINGS = 9;
 int lightThings;
 
-final int PARAMETERS = 3;
+// Parameters
+FloatDict parameters;
 
 int activeLTs;
 
@@ -34,10 +35,7 @@ float totalR, totalG, totalB;
 
 color WHITE, BLACK, RED, GREEN, BLUE;
 
-String[] parameters;
-float[] values;
-
-final int WIDTH = 400;
+final int WIDTH = 600;
 final int HEIGHT = 400;
 final int MARGIN = 20;
 final int TEXT_SIZE = 20;
@@ -46,8 +44,9 @@ final int RECT_SIZE = 100;
 final String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
 
-int sensitivity = 100;
-
+// Startup parameters
+final float SENSITIVITY = 100.0;
+final float LEVEL_PART = 0.5;
 
 // setup
 void setup()
@@ -62,6 +61,11 @@ void setup()
   BLUE = color(0, 0, 255);
   
   masterColor = BLACK;
+  
+  // Set up parameters
+  parameters = new FloatDict();
+  parameters.set("sensitivity", SENSITIVITY);
+  parameters.set("level part", LEVEL_PART);
   
   size(400,400);
   
@@ -82,17 +86,14 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity(sensitivity);
+  beat.setSensitivity((int) parameters.get("sensitivity"));
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
   bl = new BeatListener(beat, in);  
   
   // Init Dioder driver
   driver = new DioderDriver(this);
-  
-  parameters = new String[PARAMETERS];
-  values = new float[PARAMETERS];
-  
+   
   //=================================
   // Init LightThings
   lts = new LightThing[MAX_LIGHT_THINGS];
@@ -104,17 +105,19 @@ void setup()
   readLTconfig(LT_CONFIG);
 
   //=================================
+  
 }
 // end of setup
 
 // draw
 void draw()
 { 
+  
   background(0.5);
   
   fill(WHITE);
   textSize(TEXT_SIZE);
-  printParameters();
+  printSomeValues(MARGIN, MARGIN, parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings();
   
   fill(masterColor);
@@ -186,22 +189,20 @@ void keyPressed() {
     readLTconfig(LT_CONFIG);
   }
   if (key == 103) {  //g
-    if (sensitivity < 100) { sensitivity = 100;}
-    else {sensitivity = sensitivity + 100;}
-    beat.setSensitivity(sensitivity);
+    parameters.mult("sensitivity",2);
+    beat.setSensitivity((int) parameters.get("sensitivity"));
   }
   if (key == 98) {  //b
-    if (sensitivity > 100) { sensitivity = sensitivity - 100;}
-    else {sensitivity = 10;}
-    beat.setSensitivity(sensitivity); 
+    parameters.div("sensitivity",2);
+    beat.setSensitivity((int) parameters.get("sensitivity")); 
   }
   if (key == 97) {  //a
   }
   if (key == 122) { //z
-    if(levelPart > 0.1) levelPart = levelPart - 0.1;
+    parameters.set("level part", constrain(parameters.get("level part") - 0.1, 0, 1));
   }
   if (key == 120) { //x
-    if(levelPart < 1.0) levelPart = levelPart + 0.1;
+    parameters.set("level part", constrain(parameters.get("level part") + 0.1, 0, 1));
   } 
   
   // Switch LightThings on/off
@@ -251,23 +252,14 @@ void keyReleased() {
 }
 
 
-// printParameters
-void printParameters() {
+// printSomeValues
+void printSomeValues(int x, int y, String[] keys, String[] values) {
   fill(WHITE);
   textAlign(LEFT);
   
-  parameters[0] = "levelPart";
-  values[0] = levelPart;
-  
-  parameters[1] = "Sens.";
-  values[1] = sensitivity;
-  
-  parameters[2] = "Level";
-  values[2] = mixLevel;
-  
-  for (int i = 0; i < PARAMETERS; i++) {
-    text(parameters[i] + ": ", MARGIN, MARGIN + i * 1.2 * TEXT_SIZE);
-    text(values[i], 100, MARGIN + i * 1.2 * TEXT_SIZE);
+  for (int i = 0; i < keys.length; i++) {
+    text(keys[i] + ": ", x, y + i * 1.2 * TEXT_SIZE);
+    text(values[i], 150, x + i * 1.2 * TEXT_SIZE);
   }
 }
 
@@ -295,8 +287,8 @@ void readLTconfig(String filename) {
       line = null;
       break;
     }
-    if (line.equals("")) break;
-    
+    if (line == null || line.equals("")) break;
+        
     config = splitTokens(line);
     
     switch(config[1].charAt(0)) {
