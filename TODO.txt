@@ -8,6 +8,8 @@ Ei vitussa mit‰‰n erilisi‰ olioita. Kaikki tyypit on samoja, mutta tyyppiparamet
 
 Loperus pit‰‰ mietti‰, valot ei sammu.
 
-Efektivalot linkitetty tasoon.
+Efektivalot linkitetty ‰‰nentasoon.
 
-Pikavalinnoissa ei yksitt‰isi‰ valoja, vaan komboja. Mietityt v‰riyhdistelm‰t.		
+Pikavalinnoissa ei yksitt‰isi‰ valoja, vaan komboja. Mietityt v‰riyhdistelm‰t.
+
+Lis‰‰ kreditsit alkup. juttuun (web-osoite)
