@@ -27,6 +27,7 @@ int lightThings;
 
 // Parameters
 FloatDict parameters;
+FloatDict status;
 
 int activeLTs;
 
@@ -62,10 +63,14 @@ void setup()
   
   masterColor = BLACK;
   
+  
+  
   // Set up parameters
   parameters = new FloatDict();
   parameters.set("sensitivity", SENSITIVITY);
   parameters.set("level part", LEVEL_PART);
+  
+  status = new FloatDict();
   
   size(400,400);
   
@@ -126,13 +131,13 @@ void draw()
   if (follow) {
   
     // Get sound level
-    mixLevel = in.mix.level();
-    level = mixLevel * levelPart + (1 - levelPart);
+    status.set("level", in.mix.level());
+    level = status.get("level") * levelPart + (1 - levelPart);
     //level = 1;
     
     // Update lights
     for (int i = 0; i < lightThings; i++) {
-      lts[i].update(mixLevel);
+      lts[i].update(status.get("level"));
     }
     
     // Mix master color
@@ -153,6 +158,9 @@ void draw()
   
   // DioderDriver
   driver.update(masterColor);
+  
+  // Print status
+  printSomeValues(MARGIN, (int) HEIGHT/2, status.keyArray(), nf(status.valueArray(), 1, 3));
 }
 // end of draw
 
@@ -254,12 +262,15 @@ void keyReleased() {
 
 // printSomeValues
 void printSomeValues(int x, int y, String[] keys, String[] values) {
+  
+  int COLUMN_WIDTH = 150; 
+  
   fill(WHITE);
   textAlign(LEFT);
   
   for (int i = 0; i < keys.length; i++) {
     text(keys[i] + ": ", x, y + i * 1.2 * TEXT_SIZE);
-    text(values[i], 150, x + i * 1.2 * TEXT_SIZE);
+    text(values[i], x + COLUMN_WIDTH, y + i * 1.2 * TEXT_SIZE);
   }
 }
 
