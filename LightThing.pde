@@ -32,44 +32,35 @@ class LightThing
   
   // Beat
   void beat(float level) {
-    if (enabled && level > LEVEL_THRESHOLD) {
+    if (enabled) {
       r = R;
       g = G;
       b = B;
     }
   }
   
-  // Updater
-  void update(float level) { 
-  }
-  
   // Get color
-  color getColor() {
-    return color(r, g, b);
-  }
+  color getColor() { return color(r, g, b); }
   
   // Get original color
-  color getOrigColor() {
-    return color(R, G, B);
-  }
+  color getOrigColor() { return color(R, G, B); }
   
-  // Switch
-  void flip() {
-    enabled = !enabled;
-  }
+  // Flip status
+  void flip() { enabled = !enabled; }
 }
 
 
 // KickThing
 class KickThing extends LightThing
 { 
-  KickThing() {
-    super(true);
-  }
+  KickThing() { super(true); }
   
-  void update(float level) {
-    if ( beat.isKick() ) { super.beat(level);
-    } else {super.fade();}
+  void beat(float level) {
+    if ( beat.isKick() ) { 
+      super.beat(level);
+    } else {
+      super.fade();
+    }
   }
 }
 
@@ -77,13 +68,14 @@ class KickThing extends LightThing
 //SanreThing
 class SnareThing extends LightThing
 {
-  SnareThing() {
-    super(true);
-  }
+  SnareThing() { super(true); }
   
-  void update(float level) {
-    if ( beat.isSnare() ) {super.beat(level);
-    } else {super.fade();}
+  void beat(float level) {
+    if ( beat.isSnare() ) {
+      super.beat(level);
+    } else {
+      super.fade();
+    }
   }
 }
 
@@ -91,12 +83,13 @@ class SnareThing extends LightThing
 // HatThing
 class HatThing extends LightThing 
 {
-  HatThing() {
-    super(true);
-  }
+  HatThing() { super(true); }
   
-  void update(float level) {
-    if ( beat.isHat() ) {super.beat(level);
-    } else {super.fade();}
+  void beat(float level) {
+    if ( beat.isHat() ) {
+      super.beat(level);
+    } else {
+      super.fade();
+    }
   }
 }

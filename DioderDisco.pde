@@ -36,7 +36,7 @@ float totalR, totalG, totalB;
 
 color WHITE, BLACK, RED, GREEN, BLUE;
 
-final int WIDTH = 600;
+final int WIDTH = 500;
 final int HEIGHT = 400;
 final int MARGIN = 20;
 final int TEXT_SIZE = 20;
@@ -72,7 +72,7 @@ void setup()
   
   status = new FloatDict();
   
-  size(400,400);
+  size(WIDTH,HEIGHT);
   
   minim = new Minim(this);
   
@@ -126,18 +126,19 @@ void draw()
   printThings();
   
   fill(masterColor);
-  rect(WIDTH-RECT_SIZE,HEIGHT-RECT_SIZE,RECT_SIZE,RECT_SIZE);
+  rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
+  
+  // Get sound level
+  status.set("level", in.mix.level());
+  level = status.get("level") * levelPart + (1 - levelPart);
   
   if (follow) {
-  
-    // Get sound level
-    status.set("level", in.mix.level());
-    level = status.get("level") * levelPart + (1 - levelPart);
-    //level = 1;
-    
+      
     // Update lights
     for (int i = 0; i < lightThings; i++) {
-      lts[i].update(status.get("level"));
+      if ( status.get("level") > LEVEL_THRESHOLD ) {
+        lts[i].beat(0);
+      } else { lts[i].fade(); }  
     }
     
     // Mix master color
@@ -277,11 +278,14 @@ void printSomeValues(int x, int y, String[] keys, String[] values) {
 
 // printThings
 void printThings() {
+  
+  int COLUM_WIDTH = 200;
+  
   textAlign(LEFT);
   for (int i = 0; i < lightThings; i++) {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
-      text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH / 2, MARGIN + i * 1.1 * TEXT_SIZE);
+      text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
     }
   }
 }
