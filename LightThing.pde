@@ -33,9 +33,9 @@ class LightThing
   // Beat
   void beat(float level) {
     if (enabled) {
-      r = R;
-      g = G;
-      b = B;
+      r = R * level;
+      g = G * level;
+      b = B * level;
     }
   }
   

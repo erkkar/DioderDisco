@@ -7,8 +7,8 @@ import ddf.minim.analysis.*;
 import processing.serial.*;
 
 Minim        minim;
-AudioPlayer  in;
-//AudioInput   in;
+//AudioPlayer  in;
+AudioInput   in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
@@ -18,7 +18,7 @@ LightThing[] lts;
 float level;
 float mixLevel;
 float levelPart = 0.5;
-final float LEVEL_THRESHOLD = 0.001;
+final float LEVEL_THRESHOLD = 0.005;
 
 boolean follow = true;
 
@@ -76,9 +76,9 @@ void setup()
   
   minim = new Minim(this);
   
-  //in = minim.getLineIn();
-  in = minim.loadFile("sample.mp3");
-  in.loop();
+  in = minim.getLineIn();
+  //in = minim.loadFile("sample.mp3");
+  //in.loop();
   
   // a beat detection object that is FREQ_ENERGY mode that 
   // expects buffers the length of song's buffer size
@@ -125,19 +125,19 @@ void draw()
   printSomeValues(MARGIN, MARGIN, parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings();
   
-  fill(masterColor);
-  rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
+  //fill(masterColor);
+  //rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
   
   // Get sound level
   status.set("level", in.mix.level());
-  level = status.get("level") * levelPart + (1 - levelPart);
+  level = status.get("level") * parameters.get("level part") + (1 - parameters.get("level part"));
   
   if (follow) {
       
     // Update lights
     for (int i = 0; i < lightThings; i++) {
       if ( status.get("level") > LEVEL_THRESHOLD ) {
-        lts[i].beat(0);
+        lts[i].beat(level);
       } else { lts[i].fade(); }  
     }
     
