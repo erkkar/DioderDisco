@@ -72,7 +72,7 @@ void setup()
   
   status = new FloatDict();
   
-  size(WIDTH,HEIGHT);
+  size(WIDTH, HEIGHT, P2D);
   
   minim = new Minim(this);
   
@@ -332,19 +332,19 @@ void readLTconfig(String filename) {
 
 
 // stop
-void stop()
-{
-  print("Shutting down . . . ");
-  
-  // Switch lights off
-  driver.update(BLACK);
-  
-  // always close Minim audio classes when you are finished with them
-  in.close();
-  // always stop Minim before exiting
-  minim.stop();
-  // this closes the sketch
-  super.stop();
-  
-  print("done. Goodbye!");
-}
+//void stop()
+//{
+//  print("Shutting down . . . ");
+//  
+//  // Switch lights off
+//  driver.update(BLACK);
+//  
+//  // always close Minim audio classes when you are finished with them
+//  in.close();
+//  // always stop Minim before exiting
+//  minim.stop();
+//  // this closes the sketch
+//  super.stop();
+//  
+//  print("done. Goodbye!");
+//}
