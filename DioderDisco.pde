@@ -31,6 +31,11 @@ FloatDict status;
 
 int activeLTs;
 
+// Colour settings
+final float MAX_HUE = 359;
+final float MAX_SATURATION = 99;
+final float MAX_BRIGHTNESS = 99;
+
 color masterColor;
 float totalR, totalG, totalB;
 
@@ -122,15 +127,17 @@ void draw()
   
   fill(WHITE);
   textSize(TEXT_SIZE);
-  printSomeValues(MARGIN, MARGIN, parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
+  printSomeValues(MARGIN, MARGIN, 
+                  parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings();
   
-  //fill(masterColor);
-  //rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
+  fill(masterColor);
+  rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
   
   // Get sound level
   status.set("level", in.mix.level());
-  level = status.get("level") * parameters.get("level part") + (1 - parameters.get("level part"));
+  level = status.get("level") * parameters.get("level part") 
+          + (1 - parameters.get("level part"));
   
   if (follow) {
       
@@ -146,22 +153,28 @@ void draw()
     for (int i = 0; i < lightThings; i++) {
       if (lts[i].enabled) {
         activeLTs++; 
-        totalR = totalR + lts[i].r;
-        totalG = totalG + lts[i].g;
-        totalB = totalB + lts[i].b;
+        int[] rgb = lts[i].getRGB();
+        totalR = totalR + rgb[0];
+        totalG = totalG + rgb[1];
+        totalB = totalB + rgb[2];
       }
     }
     totalR = totalR / activeLTs;
     totalG = totalG / activeLTs;
-    totalB = totalB / activeLTs;  
+    totalB = totalB / activeLTs;
+    colorMode(RGB);
     masterColor = color(totalR, totalG, totalB);
   }
   
   // DioderDriver
-  driver.update(masterColor);
+  driver.r = int(totalR);
+  driver.g = int(totalG);
+  driver.b = int(totalB);
+  driver.update();
   
   // Print status
-  printSomeValues(MARGIN, (int) HEIGHT/2, status.keyArray(), nf(status.valueArray(), 1, 3));
+  printSomeValues(MARGIN, (int) HEIGHT/2, 
+                  status.keyArray(), nf(status.valueArray(), 1, 3));
 }
 // end of draw
 
@@ -285,7 +298,8 @@ void printThings() {
   for (int i = 0; i < lightThings; i++) {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
-      text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
+      text(nf(i + 1,1,0) + ": " + lts[i].comment, 
+              WIDTH - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
     }
   }
 }
@@ -320,7 +334,7 @@ void readLTconfig(String filename) {
     
     lts[i].comment = config[0];
     lts[i].fader = float(config[2]);
-    lts[i].setColor(int(config[3]), int(config[4]), int(config[5]));
+    lts[i].hue = int(config[3]);
     
     lightThings = i + 1;
   }

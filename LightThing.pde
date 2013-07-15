@@ -4,46 +4,66 @@ class LightThing
   boolean enabled;
   String comment;
   
-  float r, g, b; // current RGB values
-  float R, G, B; // RGB values of set color
+  color colour; 
+  float hue;
+  float saturation;
+  float brightness;
+  
+  float currentBrightness;
   
   // Constructor
   LightThing(boolean status) 
   {
     enabled = status;
+    hue = 0;
+    saturation = MAX_SATURATION;
+    brightness = MAX_BRIGHTNESS;
+    currentBrightness = brightness;
+    
+  }
+
+  
+  // setColour()
+  void setColour() {
+     colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+     colour = color(hue, saturation, currentBrightness);
   }
   
-  
-  void setColor(float red, float green, float blue ) {
-     R = red; G = green; B = blue;
-     r = R; g = G; b = B;
-  }
-  
-  void setColor(int red, int green, int blue, float scale) {
-     setColor(red * scale, green * scale,  blue * scale);
-  }
   
   // Fader
   void fade() {
-    r = constrain(r * fader, 0, 255); 
-    g = constrain(g * fader, 0, 255); 
-    b = constrain(b * fader, 0, 255); 
+    currentBrightness = constrain(currentBrightness * fader, 0, brightness); 
   }
   
   // Beat
   void beat(float level) {
     if (enabled) {
-      r = R * level;
-      g = G * level;
-      b = B * level;
+      currentBrightness = constrain(brightness * level, 0, MAX_BRIGHTNESS);
     }
   }
   
+  // getRGB
+  int[] getRGB() {
+    setColour();
+    int[] rgb = new int[3];
+    rgb[0] = (colour >> 16) & 0xFF;
+    rgb[1] = (colour >> 8) & 0xFF;
+    rgb[2] = colour & 0xFF;
+    return rgb;
+  }
+      
+  
   // Get color
-  color getColor() { return color(r, g, b); }
+  color getColor() { 
+    setColour();
+    return colour; 
+  }
   
   // Get original color
-  color getOrigColor() { return color(R, G, B); }
+  color getOrigColor() { 
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    return color(hue, saturation, brightness); 
+  }
   
   // Flip status
   void flip() { enabled = !enabled; }
