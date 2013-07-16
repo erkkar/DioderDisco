@@ -12,7 +12,7 @@ AudioInput   in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
-LightThing[] lts;
+LightThing[] lts = {};
 
 // Sound volume
 float level;
@@ -21,9 +21,6 @@ float levelPart = 0.5;
 final float LEVEL_THRESHOLD = 0.005;
 
 boolean follow = true;
-
-final static int MAX_LIGHT_THINGS = 9;
-int lightThings;
 
 // Parameters
 FloatDict parameters;
@@ -67,9 +64,7 @@ void setup()
   BLUE = color(0, 0, 255);
   
   masterColor = BLACK;
-  
-  
-  
+    
   // Set up parameters
   parameters = new FloatDict();
   parameters.set("sensitivity", SENSITIVITY);
@@ -106,12 +101,6 @@ void setup()
    
   //=================================
   // Init LightThings
-  lts = new LightThing[MAX_LIGHT_THINGS];
-  
-  for (int i = 0; i < MAX_LIGHT_THINGS; i++) {
-    lts[i] = new LightThing(false);
-  }
-  
   readLTconfig(LT_CONFIG);
 
   //=================================
@@ -142,18 +131,18 @@ void draw()
   if (follow) {
       
     // Update lights
-    for (int i = 0; i < lightThings; i++) {
+    for (LightThing lt : lts) {
       if ( status.get("level") > LEVEL_THRESHOLD ) {
-        lts[i].beat(level);
-      } else { lts[i].fade(); }  
+        lt.beat(level);
+      } else { lt.fade(); }  
     }
     
     // Mix master color
     totalR = 0; totalG = 0; totalB = 0; activeLTs = 0;
-    for (int i = 0; i < lightThings; i++) {
-      if (lts[i].enabled) {
+    for (LightThing lt : lts) {
+      if (lt.enabled) {
         activeLTs++; 
-        int[] rgb = lts[i].getRGB();
+        int[] rgb = lt.getRGB();
         totalR = totalR + rgb[0];
         totalG = totalG + rgb[1];
         totalB = totalB + rgb[2];
@@ -238,32 +227,10 @@ void keyPressed() {
         lt.enabled = false;
       }
   }
-  if (key == 49) { //1
-      lts[0].flip();
-  }
-  if (key == 50) { //2
-      lts[1].flip();
-  }
-  if (key == 51) { //3
-      lts[2].flip();
-  }
-  if (key == 52) { //4
-      lts[3].flip();
-  }
-  if (key == 53) { //5
-      lts[4].flip();
-  }
-  if (key == 54) { //6
-      lts[5].flip();
-  }
-  if (key == 55) { //7
-      lts[6].flip();
-  }
-  if (key == 56) { //8
-      lts[7].flip();
-  }
-  if (key == 57) { //9
-      lts[8].flip();
+  if (key >= 49 && key <= 57) {
+    try {
+        lts[key - 49].flip();
+    } catch (ArrayIndexOutOfBoundsException e) {}
   }
 }
 
@@ -295,7 +262,7 @@ void printThings() {
   int COLUM_WIDTH = 200;
   
   textAlign(LEFT);
-  for (int i = 0; i < lightThings; i++) {
+  for (int i = 0; i < lts.length; i++) {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
       text(nf(i + 1,1,0) + ": " + lts[i].comment, 
@@ -305,14 +272,14 @@ void printThings() {
 }
 
 void readLTconfig(String filename) {
+  lts = {};
   LTconfig = createReader(filename);
   String line;
   String[] config = new String[6];
-  for (int i = 0; i < MAX_LIGHT_THINGS; i++) {
+  while (true) {
     try {
       line = LTconfig.readLine();
     } catch (IOException e) {
-      e.printStackTrace();
       line = null;
       break;
     }
@@ -322,24 +289,18 @@ void readLTconfig(String filename) {
     
     switch(config[1].charAt(0)) {
       case 'k':
-        lts[i] = new KickThing();
+        lts = (LightThing[]) append(lts, new KickThing(config[0], float(config[2]), float(config[3])));
         break;
       case 's':
-        lts[i] = new SnareThing();
+        lts = (LightThing[]) append(lts, new SnareThing(config[0], float(config[2]), float(config[3])));
         break;
       case 'h':
-        lts[i] = new HatThing();
+        lts = (LightThing[]) append(lts, new HatThing(config[0], float(config[2]), float(config[3])));
         break;
     }
-    
-    lts[i].comment = config[0];
-    lts[i].fader = float(config[2]);
-    lts[i].hue = int(config[3]);
-    
-    lightThings = i + 1;
   }
   
-  println("Total Light Things read: " + lightThings);
+  println("Total Light Things read: " + lts.length);
   
 }
   
