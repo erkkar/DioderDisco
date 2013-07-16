@@ -272,7 +272,7 @@ void printThings() {
 }
 
 void readLTconfig(String filename) {
-  lts = {};
+  lts = new LightThing[0];
   LTconfig = createReader(filename);
   String line;
   String[] config = new String[6];
