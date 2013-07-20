@@ -9,7 +9,9 @@ class LightThing
   float saturation;
   float brightness;
   
-  float currentBrightness;
+  float intensity;
+  
+  float R, G, B;
   
   // Constructor
   LightThing(boolean status, String comment, float fader, float hue) 
@@ -19,46 +21,47 @@ class LightThing
     this.fader = fader;
     this.hue = hue;
     this.saturation = MAX_SATURATION;
-    this. brightness = MAX_BRIGHTNESS;
-    currentBrightness = brightness;
+    this.brightness = MAX_BRIGHTNESS;
     
-  }
-
-  
-  // setColour()
-  void setColour() {
-     colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
-     colour = color(hue, saturation, currentBrightness);
+    intensity = brightness;
+    
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    colour = color(hue, saturation, brightness);
+    R = red(colour);
+    G = green(colour);
+    B = blue(colour);
+//    R = (colour >> 16) & 0xFF;
+//    G = (colour >> 8) & 0xFF;
+//    B = colour & 0xFF;
   }
   
   
   // Fader
   void fade() {
-    currentBrightness = constrain(currentBrightness * fader, 0, brightness); 
+    intensity = constrain(intensity * fader, 0, brightness); 
   }
   
   // Beat
   void beat(float level) {
     if (enabled) {
-      currentBrightness = constrain(brightness * level, 0, MAX_BRIGHTNESS);
+      intensity = brightness * level;
     }
   }
   
   // getRGB
-  int[] getRGB() {
-    setColour();
-    int[] rgb = new int[3];
-    rgb[0] = (colour >> 16) & 0xFF;
-    rgb[1] = (colour >> 8) & 0xFF;
-    rgb[2] = colour & 0xFF;
+  float[] getRGB() {
+    float[] rgb = new float[3];
+    rgb[0] = intensity * R;
+    rgb[1] = intensity * G;
+    rgb[2] = intensity * B;
     return rgb;
   }
       
   
   // Get color
-  color getColor() { 
-    setColour();
-    return colour; 
+  color getColor() {
+    colorMode(RGB); 
+    return color(intensity * R, intensity * B, intensity * B); 
   }
   
   // Get original color
