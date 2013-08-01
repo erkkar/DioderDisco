@@ -46,6 +46,7 @@ final int RECT_SIZE = 100;
 
 final String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
+final int LTS_CONFIG_LINE_TOKENS = 6;
 
 // Startup parameters
 final float SENSITIVITY = 100.0;
@@ -298,7 +299,7 @@ void printThings() {
 void readLTconfig(String filename) {
   LTconfig = createReader(filename);
   String line;
-  String[] config = new String[6];
+  String[] config = {};
   for (int i = 0; i < MAX_LIGHT_THINGS; i++) {
     try {
       line = LTconfig.readLine();
@@ -308,8 +309,10 @@ void readLTconfig(String filename) {
       break;
     }
     if (line == null || line.equals("")) break;
-        
+    
     config = splitTokens(line);
+    // Check correct length
+    if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
     
     switch(config[1].charAt(0)) {
       case 'k':
