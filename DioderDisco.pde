@@ -26,6 +26,8 @@ boolean follow = true;
 FloatDict parameters;
 FloatDict status;
 
+boolean preview = false;
+
 int activeLTs;
 
 // Colour settings
@@ -46,6 +48,7 @@ final int RECT_SIZE = 100;
 
 final String LT_CONFIG = "LTs.cfg";
 BufferedReader LTconfig;
+final int LTS_CONFIG_LINE_TOKENS = 4;
 
 // Startup parameters
 final float SENSITIVITY = 100.0;
@@ -120,8 +123,8 @@ void draw()
                   parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings();
   
-  fill(masterColor);
-  rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
+  //Print preview
+  if (preview) drawPreview();
   
   // Get sound level
   status.set("level", in.mix.level());
@@ -162,7 +165,7 @@ void draw()
   driver.update();
   
   // Print status
-  printSomeValues(MARGIN, (int) HEIGHT/2, 
+  printSomeValues(MARGIN, (int) height/2, 
                   status.keyArray(), nf(status.valueArray(), 1, 3));
 }
 // end of draw
@@ -232,6 +235,9 @@ void keyPressed() {
         lts[key - 49].flip();
     } catch (ArrayIndexOutOfBoundsException e) {}
   }
+  if (key == 112) { //p
+    preview = !preview;
+  }
 }
 
 
@@ -266,7 +272,7 @@ void printThings() {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
       text(nf(i + 1,1,0) + ": " + lts[i].comment, 
-              WIDTH - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
+              width - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
     }
   }
 }
@@ -275,7 +281,7 @@ void readLTconfig(String filename) {
   lts = new LightThing[0];
   LTconfig = createReader(filename);
   String line;
-  String[] config = new String[6];
+  String[] config = {};
   while (true) {
     try {
       line = LTconfig.readLine();
@@ -284,8 +290,10 @@ void readLTconfig(String filename) {
       break;
     }
     if (line == null || line.equals("")) break;
-        
+    
     config = splitTokens(line);
+    // Check correct length
+    if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
     
     switch(config[1].charAt(0)) {
       case 'k':
@@ -303,6 +311,14 @@ void readLTconfig(String filename) {
   println("Total Light Things read: " + lts.length);
   
 }
+
+// drawPreview
+// Draws a colour preview on screen
+void drawPreview() {
+  fill(masterColor);
+  rect(width - RECT_SIZE, height - RECT_SIZE, RECT_SIZE, RECT_SIZE);
+}
+  
   
 
 
