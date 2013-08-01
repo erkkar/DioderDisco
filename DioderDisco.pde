@@ -5,6 +5,7 @@ Dioder Disco
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 import processing.serial.*;
+import themidibus.*;
 
 Minim        minim;
 //AudioPlayer  in;
@@ -53,6 +54,8 @@ final int LTS_CONFIG_LINE_TOKENS = 4;
 // Startup parameters
 final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
+
+MidiBus midiBus; // The MidiBus
 
 // setup
 void setup()
@@ -107,6 +110,8 @@ void setup()
   readLTconfig(LT_CONFIG);
 
   //=================================
+  
+  midiBus = new MidiBus(this, 0, -1);
   
 }
 // end of setup
@@ -317,7 +322,19 @@ void readLTconfig(String filename) {
 void drawPreview() {
   fill(masterColor);
   rect(width - RECT_SIZE, height - RECT_SIZE, RECT_SIZE, RECT_SIZE);
+} 
+
+
+void noteOn(int channel, int pitch, int velocity) {
+  follow = false;
+  colorMode(HSB, 127,1,127);
+  masterColor = color(pitch,1,velocity);
 }
+
+void noteOff(int channel, int pitch, int velocity) {
+  follow = true;
+}
+
   
   
 
