@@ -29,6 +29,8 @@ int lightThings;
 FloatDict parameters;
 FloatDict status;
 
+boolean preview = false;
+
 int activeLTs;
 
 color masterColor;
@@ -125,8 +127,8 @@ void draw()
   printSomeValues(MARGIN, MARGIN, parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings();
   
-  //fill(masterColor);
-  //rect(WIDTH-RECT_SIZE, HEIGHT-RECT_SIZE, RECT_SIZE, RECT_SIZE);
+  //Print preview
+  if (preview) drawPreview();
   
   // Get sound level
   status.set("level", in.mix.level());
@@ -161,7 +163,7 @@ void draw()
   driver.update(masterColor);
   
   // Print status
-  printSomeValues(MARGIN, (int) HEIGHT/2, status.keyArray(), nf(status.valueArray(), 1, 3));
+  printSomeValues(MARGIN, (int) height/2, status.keyArray(), nf(status.valueArray(), 1, 3));
 }
 // end of draw
 
@@ -252,6 +254,9 @@ void keyPressed() {
   if (key == 57) { //9
       lts[8].flip();
   }
+  if (key == 112) { //p
+    preview = !preview;
+  }
 }
 
 
@@ -285,7 +290,7 @@ void printThings() {
   for (int i = 0; i < lightThings; i++) {
     if (lts[i].enabled) { 
       fill(lts[i].getOrigColor());
-      text(nf(i + 1,1,0) + ": " + lts[i].comment, WIDTH - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
+      text(nf(i + 1,1,0) + ": " + lts[i].comment, width - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
     }
   }
 }
@@ -328,6 +333,14 @@ void readLTconfig(String filename) {
   println("Total Light Things read: " + lightThings);
   
 }
+
+// drawPreview
+// Draws a colour preview on screen
+void drawPreview() {
+  fill(masterColor);
+  rect(width - RECT_SIZE, height - RECT_SIZE, RECT_SIZE, RECT_SIZE);
+}
+  
   
 
 
