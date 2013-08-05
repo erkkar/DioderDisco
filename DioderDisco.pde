@@ -14,6 +14,7 @@ BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
 LightThing[] lts = {};
+LightSet effects;
 
 // Sound volume
 float level;
@@ -21,18 +22,18 @@ float mixLevel;
 float levelPart = 0.5;
 final float LEVEL_THRESHOLD = 0.005;
 
-boolean follow = true;
+boolean follow = false;
 
 // Parameters
 FloatDict parameters;
 FloatDict status;
 
-boolean preview = false;
+boolean preview = true;
 
 int activeLTs;
 
 // Colour settings
-final float MAX_HUE = 359;
+final int MAX_HUE = 359;
 final float MAX_SATURATION = 1;
 final float MAX_BRIGHTNESS = 1;
 
@@ -54,13 +55,14 @@ final int LTS_CONFIG_LINE_TOKENS = 4;
 // Startup parameters
 final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
+final float EFFECT_FADER = 0.9;
 
 MidiBus midiBus; // The MidiBus
 
 // setup
 void setup()
 {
-  colorMode(RGB);
+  colorMode(RGB, 255);
   
   // Define static colors
   WHITE = color(255, 255, 255);
@@ -108,6 +110,8 @@ void setup()
   //=================================
   // Init LightThings
   readLTconfig(LT_CONFIG);
+  
+  effects = new LightSet();
 
   //=================================
   
@@ -126,7 +130,8 @@ void draw()
   textSize(TEXT_SIZE);
   printSomeValues(MARGIN, MARGIN, 
                   parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
-  printThings();
+  //printThings(lts);
+  printThings(effects.theSet);
   
   //Print preview
   if (preview) drawPreview();
@@ -159,8 +164,12 @@ void draw()
     totalR = totalR / activeLTs;
     totalG = totalG / activeLTs;
     totalB = totalB / activeLTs;
-    colorMode(RGB);
+    colorMode(RGB, 255);
     masterColor = color(totalR, totalG, totalB);
+  } else {
+    masterColor = effects.mixColour();
+    effects.fade();
+    effects.clean();
   }
   
   // DioderDriver
@@ -179,18 +188,24 @@ void draw()
 // keyPressed
 void keyPressed() {
   
+  // --------------------------------
+  // Light effects
+  
   if (key == 44) { //,
       follow = false;
-      masterColor = RED;
+      effects.enable(0, EFFECT_FADER);
   }
   if (key == 46) { //.
       follow = false;
-      masterColor = GREEN;
+      effects.enable(120, EFFECT_FADER);
   }
   if (key == 45) { //-
       follow = false;
-      masterColor = BLUE;
+      effects.enable(240, EFFECT_FADER);
   }
+  
+  // --------------------------------
+  
   if (key == 8) { // Backsapce
     if (follow) {
       follow = false;
@@ -248,7 +263,20 @@ void keyPressed() {
 
 // keyReleased
 void keyReleased() { 
-  if (key != 8) follow = true;
+  
+  //-----------------------------
+  // Light effects
+  //if (key != 8) follow = true;
+  if (key == 44) { //,
+      effects.disable(0);
+  }
+  if (key == 46) { //.
+      effects.disable(120);
+  }
+  if (key == 45) { //-
+      effects.disable(240);
+  }
+  //-----------------------------
 }
 
 
@@ -268,16 +296,19 @@ void printSomeValues(int x, int y, String[] keys, String[] values) {
 
 
 // printThings
-void printThings() {
+void printThings(LightThing[] lts) {
   
   int COLUM_WIDTH = 200;
+  float LINESPREAD = 1.1;
   
   textAlign(LEFT);
-  for (int i = 0; i < lts.length; i++) {
-    if (lts[i].enabled) { 
-      fill(lts[i].getOrigColor());
-      text(nf(i + 1,1,0) + ": " + lts[i].comment, 
-              width - COLUM_WIDTH, MARGIN + i * 1.1 * TEXT_SIZE);
+  int i = 0;
+  for (LightThing lt : lts) {
+    if (lt != null) { 
+      fill(lt.getOrigColor());
+      text(nf(i + 1,1,0) + ": " + lt.comment, 
+              width - COLUM_WIDTH, MARGIN + i * LINESPREAD * TEXT_SIZE);
+      i++;
     }
   }
 }

@@ -27,12 +27,10 @@ class LightThing
     
     colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
     colour = color(hue, saturation, brightness);
-    R = red(colour);
-    G = green(colour);
-    B = blue(colour);
-//    R = (colour >> 16) & 0xFF;
-//    G = (colour >> 8) & 0xFF;
-//    B = colour & 0xFF;
+    colorMode(RGB, 255);
+    R = (colour >> 16) & 0xFF;
+    G = (colour >> 8) & 0xFF;
+    B = colour & 0xFF;
   }
   
   

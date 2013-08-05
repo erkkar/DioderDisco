@@ -1,11 +1,8 @@
-import java.util.LinkedList;
+//import java.util.LinkedList;
 
 class LightSet
 {
- 
-  int MAX_LTS = 3;
-  
-  LinkedList<LightThing> theSet;
+  LightThing[] theSet;
   
   int activeLTs;
   
@@ -15,11 +12,11 @@ class LightSet
   
   // Constructor
   LightSet() {
-     theSet = new LinkedList<LightThing>();
+     theSet = new LightThing[MAX_HUE + 1];
   }
   
   color mixColour() {
-    // Mix master color
+    // Mix colours
     
     r = 0;
     g = 0;
@@ -27,8 +24,8 @@ class LightSet
     
     activeLTs = 0;
     
-    for (LightThing lt : theSet) {
-      if (lt.enabled) {
+    for (LightThing lt : theSet) {      
+      if (lt != null) {
         activeLTs++; 
         float[] rgb = lt.getRGB();
         r = r + rgb[0];
@@ -36,13 +33,34 @@ class LightSet
         b = b + rgb[2];
       }
     }
-    r = totalR / activeLTs;
-    g = totalG / activeLTs;
-    b = totalB / activeLTs;
+    r = r / activeLTs;
+    g = g / activeLTs;
+    b = b / activeLTs;
     
-    colorMode(RGB);
-    return color(totalR, totalG, totalB);
+    colorMode(RGB, 255);
+    return color(r, g, b);
   }
   
+  void enable(int hue, float fader) {
+    theSet[hue] = new LightThing(true, "effect", fader, hue);
+  }
+  
+  void disable(int hue) {
+    theSet[hue].enabled = false;
+  }
+  
+  void fade() {
+    for (LightThing lt : theSet) {
+      if (lt != null && !lt.enabled) lt.fade();
+    }
+  }
+  
+  void clean() {
+    for (int i = 0; i < theSet.length; i++) {
+      if (theSet[i] != null && theSet[i].intensity < 0.1 * MAX_BRIGHTNESS) {
+        theSet[i] = null;
+      }
+    }
+  }
 }
         
