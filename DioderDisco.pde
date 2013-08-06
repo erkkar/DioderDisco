@@ -13,8 +13,9 @@ AudioInput   in;
 BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
-LightThing[] lts = {};
-LightSet effects;
+
+BeatSet beatLights;
+EffectSet effects;
 
 // Sound volume
 float level;
@@ -49,7 +50,6 @@ final int TEXT_SIZE = 20;
 final int RECT_SIZE = 100;
 
 final String LT_CONFIG = "LTs.cfg";
-BufferedReader LTconfig;
 final int LTS_CONFIG_LINE_TOKENS = 4;
 
 // Startup parameters
@@ -109,10 +109,11 @@ void setup()
    
   //=================================
   // Init LightThings
-  readLTconfig(LT_CONFIG);
+  beatLights = new BeatSet();
+  beatLights.readConfig(LT_CONFIG);
   
-  effects = new LightSet();
-
+  effects = new EffectSet(MAX_HUE + 1);
+  
   //=================================
   
   midiBus = new MidiBus(this, 0, -1);
@@ -130,8 +131,8 @@ void draw()
   textSize(TEXT_SIZE);
   printSomeValues(MARGIN, MARGIN, 
                   parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
-  //printThings(lts);
-  printThings(effects.theSet);
+  printThings(beatLights.theSet, MARGIN);
+  printThings(effects.theSet, MARGIN + 10 * TEXT_SIZE);
   
   //Print preview
   if (preview) drawPreview();
@@ -142,35 +143,16 @@ void draw()
           + (1 - parameters.get("level part"));
   
   if (follow) {
-      
     // Update lights
-    for (LightThing lt : lts) {
-      if ( status.get("level") > LEVEL_THRESHOLD ) {
-        lt.beat(level);
-      } else { lt.fade(); }  
-    }
+    beatLights.update(status.get("level"));
     
     // Mix master color
-    totalR = 0; totalG = 0; totalB = 0; activeLTs = 0;
-    for (LightThing lt : lts) {
-      if (lt.enabled) {
-        activeLTs++; 
-        float[] rgb = lt.getRGB();
-        totalR = totalR + rgb[0];
-        totalG = totalG + rgb[1];
-        totalB = totalB + rgb[2];
-      }
-    }
-    totalR = totalR / activeLTs;
-    totalG = totalG / activeLTs;
-    totalB = totalB / activeLTs;
-    colorMode(RGB, 255);
-    masterColor = color(totalR, totalG, totalB);
+    masterColor = beatLights.mixColour();
   } else {
     masterColor = effects.mixColour();
-    effects.fade();
-    effects.clean();
   }
+  effects.fadeAll();
+  effects.clean();
   
   // DioderDriver
   driver.r = int(totalR);
@@ -193,15 +175,15 @@ void keyPressed() {
   
   if (key == 44) { //,
       follow = false;
-      effects.enable(0, EFFECT_FADER);
+      effects.create(0, EFFECT_FADER);
   }
   if (key == 46) { //.
       follow = false;
-      effects.enable(120, EFFECT_FADER);
+      effects.create(120, EFFECT_FADER);
   }
   if (key == 45) { //-
       follow = false;
-      effects.enable(240, EFFECT_FADER);
+      effects.create(240, EFFECT_FADER);
   }
   
   // --------------------------------
@@ -220,7 +202,7 @@ void keyPressed() {
   }       
   // Re-read light configuration
   if (key == 114) {  //r
-    readLTconfig(LT_CONFIG);
+    beatLights.readConfig(LT_CONFIG);
   }
   if (key == 103) {  //g
     parameters.mult("sensitivity",2);
@@ -241,19 +223,13 @@ void keyPressed() {
   
   // Switch LightThings on/off
   if (key == 48) { //0
-      for (LightThing lt : lts) { 
-        lt.enabled = true;
-      }
+      beatLights.enableAll();
   }
   if (key == 43) { //0
-      for (LightThing lt : lts) { 
-        lt.enabled = false;
-      }
+    beatLights.disableAll();
   }
   if (key >= 49 && key <= 57) {
-    try {
-        lts[key - 49].flip();
-    } catch (ArrayIndexOutOfBoundsException e) {}
+    beatLights.flip(key - 49);
   }
   if (key == 112) { //p
     preview = !preview;
@@ -296,57 +272,26 @@ void printSomeValues(int x, int y, String[] keys, String[] values) {
 
 
 // printThings
-void printThings(LightThing[] lts) {
+void printThings(LightThing[] lts, int yPos) {
   
   int COLUM_WIDTH = 200;
   float LINESPREAD = 1.1;
   
   textAlign(LEFT);
+  
   int i = 0;
+  
   for (LightThing lt : lts) {
     if (lt != null) { 
       fill(lt.getOrigColor());
-      text(nf(i + 1,1,0) + ": " + lt.comment, 
-              width - COLUM_WIDTH, MARGIN + i * LINESPREAD * TEXT_SIZE);
-      i++;
+      text(nf(i + 1,1,0) + ": " + lt.comment, width - COLUM_WIDTH, yPos);
+      yPos = int(yPos + LINESPREAD * TEXT_SIZE);
     }
+    i++;
   }
 }
 
-void readLTconfig(String filename) {
-  lts = new LightThing[0];
-  LTconfig = createReader(filename);
-  String line;
-  String[] config = {};
-  while (true) {
-    try {
-      line = LTconfig.readLine();
-    } catch (IOException e) {
-      line = null;
-      break;
-    }
-    if (line == null || line.equals("")) break;
-    
-    config = splitTokens(line);
-    // Check correct length
-    if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
-    
-    switch(config[1].charAt(0)) {
-      case 'k':
-        lts = (LightThing[]) append(lts, new KickThing(config[0], float(config[2]), float(config[3])));
-        break;
-      case 's':
-        lts = (LightThing[]) append(lts, new SnareThing(config[0], float(config[2]), float(config[3])));
-        break;
-      case 'h':
-        lts = (LightThing[]) append(lts, new HatThing(config[0], float(config[2]), float(config[3])));
-        break;
-    }
-  }
-  
-  println("Total Light Things read: " + lts.length);
-  
-}
+
 
 // drawPreview
 // Draws a colour preview on screen

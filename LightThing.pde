@@ -1,3 +1,4 @@
+// LightThing
 class LightThing 
 {
   float fader;
@@ -33,13 +34,12 @@ class LightThing
     B = colour & 0xFF;
   }
   
-  
-  // Fader
+  // fade
   void fade() {
     intensity = constrain(intensity * fader, 0, brightness); 
   }
   
-  // Beat
+  // beat
   void beat(float level) {
     if (enabled) {
       intensity = brightness * level;
@@ -54,29 +54,33 @@ class LightThing
     rgb[2] = intensity * B;
     return rgb;
   }
-      
   
-  // Get color
+  // getColor
   color getColor() {
-    colorMode(RGB); 
+    colorMode(RGB, 255); 
     return color(intensity * R, intensity * B, intensity * B); 
   }
   
   // Get original color
   color getOrigColor() { 
-    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
-    return color(hue, saturation, brightness); 
+    colorMode(RGB, 255);
+    return color(R, G, B); 
   }
   
-  // Flip status
-  void flip() { enabled = !enabled; }
+  // flip
+  void flip() { 
+    enabled = !enabled; 
+  }
 }
 
 
 // KickThing
 class KickThing extends LightThing
-{ 
-  KickThing(String comment, float fader, float hue) { super(true, comment, fader, hue); }
+{
+  // Constructor
+  KickThing(String comment, float fader, float hue) {
+    super(true, comment, fader, hue); 
+  }
   
   void beat(float level) {
     if ( beat.isKick() ) { 
@@ -88,10 +92,13 @@ class KickThing extends LightThing
 }
 
 
-//SanreThing
+//SnareThing
 class SnareThing extends LightThing
 {
-  SnareThing(String comment, float fader, float hue) { super(true, comment, fader, hue); }
+  // Constructor
+  SnareThing(String comment, float fader, float hue) {
+    super(true, comment, fader, hue); 
+  }
   
   void beat(float level) {
     if ( beat.isSnare() ) {
@@ -106,7 +113,10 @@ class SnareThing extends LightThing
 // HatThing
 class HatThing extends LightThing 
 {
-  HatThing(String comment, float fader, float hue) { super(true, comment, fader, hue); }
+  // Constructor
+  HatThing(String comment, float fader, float hue) {
+    super(true, comment, fader, hue); 
+  }
   
   void beat(float level) {
     if ( beat.isHat() ) {
