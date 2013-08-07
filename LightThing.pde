@@ -126,3 +126,27 @@ class HatThing extends LightThing
     }
   }
 }
+
+
+// EffectThing
+//class EffectThing extends LightThing
+//{
+//  // Constructor
+//  EffectThing(float hue, float saturation, float brightness) {
+//    enabled = status;
+//    this.comment = "";
+//    this.fader = EFFECT_FADER;
+//    this.hue = hue;
+//    this.saturation = saturation;
+//    this.brightness = MAX_BRIGHTNE;
+//    
+//    intensity = brightness;
+//    
+//    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+//    colour = color(hue, saturation, brightness);
+//    colorMode(RGB, 255);
+//    R = (colour >> 16) & 0xFF;
+//    G = (colour >> 8) & 0xFF;
+//    B = colour & 0xFF;
+//  }
+//}

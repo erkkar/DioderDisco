@@ -2,6 +2,8 @@
 
 class LightSet
 {
+  boolean enabled;
+  int howMany = 0;
   LightThing[] theSet;
   
   // Constructor
@@ -10,33 +12,27 @@ class LightSet
   }
   
   // mixColour
-  color mixColour() {
+  float[] mixRGB() {
     // Mix colours
     
     float r = 0;
     float g = 0;
     float b = 0;
     
-    int count = 0;
-    
     for (LightThing lt : theSet) {      
-      if (lt != null) {
-        count++; 
+      if (lt != null) { 
         float[] rgb = lt.getRGB();
-        r = r + rgb[0];
-        g = g + rgb[1];
-        b = b + rgb[2];
+        r = max(r, rgb[0]);
+        g = max(g, rgb[1]);
+        b = max(b, rgb[2]);
       }
     }
-    r = r / count;
-    g = g / count;
-    b = b / count;
-    
-    colorMode(RGB, 255);
-    return color(r, g, b);
+    float[] rgb = {r, g, b};
+    return rgb;
   }
   
   void enable(int index) {
+    enabled = true;
     theSet[index].enabled = true;
   }
   
@@ -116,7 +112,9 @@ class BeatSet extends LightSet
           break;
       }
     }
-    println("Total Light Things read: " + theSet.length);  
+    howMany = theSet.length;
+    if (howMany > 0) enabled = true;
+    println("Total Light Things read: " + howMany);  
   }
 }
 
@@ -130,6 +128,7 @@ class EffectSet extends LightSet
   }
   
   void create(int hue, float fader) {
+    enabled = true;
     theSet[hue] = new LightThing(true, "effect", fader, hue);
   }
   
@@ -140,10 +139,16 @@ class EffectSet extends LightSet
   }
   
   void clean() {
+    howMany = 0;
     for (int i = 0; i < theSet.length; i++) {
-      if (theSet[i] != null && theSet[i].intensity < 0.1 * MAX_BRIGHTNESS) {
-        theSet[i] = null;
+      if (theSet[i] != null) {
+        howMany++;
+        if (theSet[i].intensity < 0.1 * MAX_BRIGHTNESS) {
+          theSet[i] = null;
+          howMany--;
+        }
       }
     }
+    if (howMany == 0) enabled = false;
   }
 }

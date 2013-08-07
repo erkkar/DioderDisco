@@ -23,7 +23,7 @@ float mixLevel;
 float levelPart = 0.5;
 final float LEVEL_THRESHOLD = 0.005;
 
-boolean follow = false;
+boolean follow = true;
 
 // Parameters
 FloatDict parameters;
@@ -39,9 +39,10 @@ final float MAX_SATURATION = 1;
 final float MAX_BRIGHTNESS = 1;
 
 color masterColor;
-float totalR, totalG, totalB;
+float[] masterRGB;
 
 color WHITE, BLACK, RED, GREEN, BLUE;
+float[] BLACK_RGB = {0, 0, 0};
 
 final int WIDTH = 500;
 final int HEIGHT = 400;
@@ -72,6 +73,7 @@ void setup()
   BLUE = color(0, 0, 255);
   
   masterColor = BLACK;
+  masterRGB = BLACK_RGB;
     
   // Set up parameters
   parameters = new FloatDict();
@@ -142,27 +144,37 @@ void draw()
   level = status.get("level") * parameters.get("level part") 
           + (1 - parameters.get("level part"));
   
-  if (follow) {
+  if (effects.enabled) {
+    masterRGB = effects.mixRGB();
+  } else if (follow && beatLights.enabled) {
     // Update lights
     beatLights.update(status.get("level"));
-    
     // Mix master color
-    masterColor = beatLights.mixColour();
+    masterRGB = beatLights.mixRGB();
   } else {
-    masterColor = effects.mixColour();
+    masterRGB = BLACK_RGB;
   }
+  colorMode(RGB, 255);
+  masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
+    
+  // Fade & clean effects
   effects.fadeAll();
   effects.clean();
   
   // DioderDriver
-  driver.r = int(totalR);
-  driver.g = int(totalG);
-  driver.b = int(totalB);
+  driver.r = int(masterRGB[0]);
+  driver.g = int(masterRGB[1]);
+  driver.b = int(masterRGB[2]);
   driver.update();
   
   // Print status
   printSomeValues(MARGIN, (int) height/2, 
                   status.keyArray(), nf(status.valueArray(), 1, 3));
+                  
+  text("Follow: "+follow, MARGIN, height - MARGIN - 3.3*TEXT_SIZE);                
+  text("Beats: "+beatLights.enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
+  text("Effects: "+effects.enabled, MARGIN, height - MARGIN - TEXT_SIZE);
+  status.set("effects",effects.howMany);
 }
 // end of draw
 
@@ -174,15 +186,12 @@ void keyPressed() {
   // Light effects
   
   if (key == 44) { //,
-      follow = false;
       effects.create(0, EFFECT_FADER);
   }
   if (key == 46) { //.
-      follow = false;
       effects.create(120, EFFECT_FADER);
   }
   if (key == 45) { //-
-      follow = false;
       effects.create(240, EFFECT_FADER);
   }
   
@@ -191,14 +200,13 @@ void keyPressed() {
   if (key == 8) { // Backsapce
     if (follow) {
       follow = false;
-      masterColor = BLACK;
     } else { 
       follow = true;
     }
   }
   if (key == 10) { // Enter
-      follow = false;
-      masterColor = WHITE;
+  //    follow = false;
+  //    masterColor = WHITE;
   }       
   // Re-read light configuration
   if (key == 114) {  //r
@@ -240,9 +248,10 @@ void keyPressed() {
 // keyReleased
 void keyReleased() { 
   
+  if (key != 8) follow = true;
+  
   //-----------------------------
   // Light effects
-  //if (key != 8) follow = true;
   if (key == 44) { //,
       effects.disable(0);
   }
@@ -282,7 +291,7 @@ void printThings(LightThing[] lts, int yPos) {
   int i = 0;
   
   for (LightThing lt : lts) {
-    if (lt != null) { 
+    if (lt != null && lt.enabled) { 
       fill(lt.getOrigColor());
       text(nf(i + 1,1,0) + ": " + lt.comment, width - COLUM_WIDTH, yPos);
       yPos = int(yPos + LINESPREAD * TEXT_SIZE);
@@ -300,19 +309,25 @@ void drawPreview() {
   rect(width - RECT_SIZE, height - RECT_SIZE, RECT_SIZE, RECT_SIZE);
 } 
 
-
+// ------------------------------------------------------------------------
+// MIDI Control
 void noteOn(int channel, int pitch, int velocity) {
-  follow = false;
-  colorMode(HSB, 127,1,127);
-  masterColor = color(pitch,1,velocity);
+  print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
+  float  hue = note2hue(pitch);
+  print("Hue: " + hue + "\n");
+  effects.create(int(hue), EFFECT_FADER);
 }
 
 void noteOff(int channel, int pitch, int velocity) {
-  follow = true;
+  effects.disable(int(note2hue(pitch)));
+}
+
+float note2hue(int pitch) {
+  return float(pitch) / 24 * MAX_HUE;
 }
 
   
-  
+// ------------------------------------------------------------------------  
 
 
 // stop
