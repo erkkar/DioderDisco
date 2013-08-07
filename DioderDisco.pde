@@ -58,6 +58,9 @@ final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
 
+float masterLevel = 1;
+float[] masterBalance = {1, 1, 1};
+
 MidiBus midiBus; // The MidiBus
 
 // setup
@@ -79,6 +82,7 @@ void setup()
   parameters = new FloatDict();
   parameters.set("sensitivity", SENSITIVITY);
   parameters.set("level part", LEVEL_PART);
+  parameters.set("eff fader", EFFECT_FADER);
   
   status = new FloatDict();
   
@@ -134,7 +138,6 @@ void draw()
   printSomeValues(MARGIN, MARGIN, 
                   parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings(beatLights.theSet, MARGIN);
-  printThings(effects.theSet, MARGIN + 10 * TEXT_SIZE);
   
   //Print preview
   if (preview) drawPreview();
@@ -153,13 +156,19 @@ void draw()
     masterRGB = beatLights.mixRGB();
   } else {
     masterRGB = BLACK_RGB;
-  }
-  colorMode(RGB, 255);
-  masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
-    
+  }  
   // Fade & clean effects
   effects.fadeAll();
   effects.clean();
+  
+  // Scale with level settings
+  for (int i = 0; i < 3; i++) {
+    masterRGB[i] = masterLevel * masterBalance[i] * masterRGB[i];
+  }
+  
+  colorMode(RGB, 255);
+  masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
+  
   
   // DioderDriver
   driver.r = int(masterRGB[0]);
@@ -174,7 +183,6 @@ void draw()
   text("Follow: "+follow, MARGIN, height - MARGIN - 3.3*TEXT_SIZE);                
   text("Beats: "+beatLights.enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
   text("Effects: "+effects.enabled, MARGIN, height - MARGIN - TEXT_SIZE);
-  status.set("effects",effects.howMany);
 }
 // end of draw
 
@@ -315,7 +323,7 @@ void noteOn(int channel, int pitch, int velocity) {
   print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
   float  hue = note2hue(pitch);
   print("Hue: " + hue + "\n");
-  effects.create(int(hue), EFFECT_FADER);
+  effects.create(int(hue), parameters.get("eff fader"));
 }
 
 void noteOff(int channel, int pitch, int velocity) {
@@ -324,6 +332,24 @@ void noteOff(int channel, int pitch, int velocity) {
 
 float note2hue(int pitch) {
   return float(pitch) / 24 * MAX_HUE;
+}
+
+void controllerChange(int channel, int number, int value) {
+  if (number == 7) { //C9
+   masterLevel = float(value) / 127; 
+  }
+  if (number == 6) { //C8
+    parameters.set("eff fader", float(value) / 127);
+  }
+  if (number == 74) { //C1
+    masterBalance[0] = float(value) / 127;  
+  }
+  if (number == 71) { //C2
+    masterBalance[1] = float(value) / 127;  
+  }
+  if (number == 52) { //C3
+    masterBalance[2] = float(value) / 127;  
+  }
 }
 
   
