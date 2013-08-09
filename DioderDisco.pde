@@ -23,7 +23,6 @@ float mixLevel;
 float levelPart = 0.5;
 final float LEVEL_THRESHOLD = 0.005;
 
-boolean follow = true;
 
 // Parameters
 FloatDict parameters;
@@ -34,9 +33,10 @@ boolean preview = true;
 int activeLTs;
 
 // Colour settings
-final int MAX_HUE = 359;
+final int MAX_HUE = 360;
 final float MAX_SATURATION = 1;
 final float MAX_BRIGHTNESS = 1;
+final float INTENSITY_THRESHOLD = 0.01;
 
 color masterColor;
 float[] masterRGB;
@@ -118,7 +118,7 @@ void setup()
   beatLights = new BeatSet();
   beatLights.readConfig(LT_CONFIG);
   
-  effects = new EffectSet(MAX_HUE + 1);
+  effects = new EffectSet(128);
   
   //=================================
   
@@ -138,6 +138,7 @@ void draw()
   printSomeValues(MARGIN, MARGIN, 
                   parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
   printThings(beatLights.theSet, MARGIN);
+  printThings(effects.theSet, height/2);
   
   //Print preview
   if (preview) drawPreview();
@@ -149,7 +150,7 @@ void draw()
   
   if (effects.enabled) {
     masterRGB = effects.mixRGB();
-  } else if (follow && beatLights.enabled) {
+  } else if (beatLights.enabled) {
     // Update lights
     beatLights.update(status.get("level"));
     // Mix master color
@@ -179,8 +180,7 @@ void draw()
   // Print status
   printSomeValues(MARGIN, (int) height/2, 
                   status.keyArray(), nf(status.valueArray(), 1, 3));
-                  
-  text("Follow: "+follow, MARGIN, height - MARGIN - 3.3*TEXT_SIZE);                
+                                  
   text("Beats: "+beatLights.enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
   text("Effects: "+effects.enabled, MARGIN, height - MARGIN - TEXT_SIZE);
 }
@@ -190,31 +190,20 @@ void draw()
 // keyPressed
 void keyPressed() {
   
-  // --------------------------------
-  // Light effects
-  
   if (key == 44) { //,
-      effects.create(0, EFFECT_FADER);
+      
   }
   if (key == 46) { //.
-      effects.create(120, EFFECT_FADER);
+      
   }
   if (key == 45) { //-
-      effects.create(240, EFFECT_FADER);
+      
   }
-  
-  // --------------------------------
   
   if (key == 8) { // Backsapce
-    if (follow) {
-      follow = false;
-    } else { 
-      follow = true;
-    }
+    beatLights.enabled = !beatLights.enabled; 
   }
   if (key == 10) { // Enter
-  //    follow = false;
-  //    masterColor = WHITE;
   }       
   // Re-read light configuration
   if (key == 114) {  //r
@@ -254,22 +243,8 @@ void keyPressed() {
 
 
 // keyReleased
-void keyReleased() { 
+void keyReleased() {   
   
-  if (key != 8) follow = true;
-  
-  //-----------------------------
-  // Light effects
-  if (key == 44) { //,
-      effects.disable(0);
-  }
-  if (key == 46) { //.
-      effects.disable(120);
-  }
-  if (key == 45) { //-
-      effects.disable(240);
-  }
-  //-----------------------------
 }
 
 
@@ -321,17 +296,17 @@ void drawPreview() {
 // MIDI Control
 void noteOn(int channel, int pitch, int velocity) {
   print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
-  float  hue = note2hue(pitch);
-  print("Hue: " + hue + "\n");
-  effects.create(int(hue), parameters.get("eff fader"));
+  float hue, saturation, brightness;
+  hue = (float(pitch) % 12) * 30;
+  saturation = float(pitch) / 120 * MAX_SATURATION; 
+  brightness = float(velocity) / 127;
+  print("H: " + hue + " S: " + saturation + " B: + " + brightness + "\n");
+  effects.change(pitch, parameters.get("eff fader"), hue, saturation, brightness);
 }
 
 void noteOff(int channel, int pitch, int velocity) {
-  effects.disable(int(note2hue(pitch)));
-}
-
-float note2hue(int pitch) {
-  return float(pitch) / 24 * MAX_HUE;
+  effects.disable(pitch);
+  print("OFF: " + pitch + "\n");
 }
 
 void controllerChange(int channel, int number, int value) {

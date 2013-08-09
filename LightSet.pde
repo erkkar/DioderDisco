@@ -3,7 +3,6 @@
 class LightSet
 {
   boolean enabled;
-  int howMany = 0;
   LightThing[] theSet;
   
   // Constructor
@@ -20,7 +19,7 @@ class LightSet
     float b = 0;
     
     for (LightThing lt : theSet) {      
-      if (lt != null) { 
+      if (lt.intensity > INTENSITY_THRESHOLD) { 
         float[] rgb = lt.getRGB();
         r = max(r, rgb[0]);
         g = max(g, rgb[1]);
@@ -43,7 +42,7 @@ class LightSet
   }
   
   void disable(int index) {
-    theSet[index].enabled = false;
+    if (theSet[index] != null) theSet[index].enabled = false;
   }
   
   void disableAll() {
@@ -112,9 +111,10 @@ class BeatSet extends LightSet
           break;
       }
     }
-    howMany = theSet.length;
-    if (howMany > 0) enabled = true;
-    println("Total Light Things read: " + howMany);  
+    if (theSet.length > 0) {
+      enabled = true;
+      println("Total Light Things read: " + theSet.length);
+    }
   }
 }
 
@@ -125,11 +125,14 @@ class EffectSet extends LightSet
   // Constructor
   EffectSet(int size) {
     super(size);
+    for (int i = 0; i < size; i++) {
+      theSet[i] = new LightThing(false, "effect", EFFECT_FADER, 0);
+    }
   }
   
-  void create(int hue, float fader) {
+  void change(int index, float fader, float hue, float saturation, float brightness) {
     enabled = true;
-    theSet[hue] = new LightThing(true, "effect", fader, hue);
+    theSet[index].change(fader, hue, saturation, brightness);
   }
   
   void fadeAll() {
@@ -139,15 +142,9 @@ class EffectSet extends LightSet
   }
   
   void clean() {
-    howMany = 0;
-    for (int i = 0; i < theSet.length; i++) {
-      if (theSet[i] != null) {
-        howMany++;
-        if (theSet[i].intensity < 0.1 * MAX_BRIGHTNESS) {
-          theSet[i] = null;
-          howMany--;
-        }
-      }
+    int howMany = 0;
+    for (LightThing lt : theSet) {
+      if (lt.intensity < INTENSITY_THRESHOLD) howMany++;
     }
     if (howMany == 0) enabled = false;
   }

@@ -24,8 +24,22 @@ class LightThing
     this.saturation = MAX_SATURATION;
     this.brightness = MAX_BRIGHTNESS;
     
-    intensity = brightness;
+    intensity = 0;
     
+    calcRGB();
+  }
+  
+  void change(float fader, float hue, float saturation, float brightness) {
+    enabled = true;
+    this.fader = fader;
+    this.hue = hue;
+    this.saturation = saturation;
+    this.brightness = brightness;
+    this.intensity = brightness; 
+    calcRGB();
+  }
+  
+  void calcRGB() {
     colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
     colour = color(hue, saturation, brightness);
     colorMode(RGB, 255);
