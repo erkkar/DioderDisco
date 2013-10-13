@@ -314,24 +314,25 @@ void noteOff(int channel, int pitch, int velocity) {
   print("OFF: " + pitch + "\n");
 }
 
-void controllerChange(int channel, int number, int value) {
+void controllerChange(int channel, int number, int value) {  
+  println("Controller: " + str(number));
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
-  if (number == 6) { //C8
+  if (number == 76) { //C8
     parameters.set("eff fader", float(value) / 127);
   }
-  if (number == 74) { //C1
+  if (number == 91) { //C1
     masterBalance[0] = float(value) / 127;
-    parameters.set("master red", masterBalance[0]); 
+    parameters.set("master red", float(value) / 127);
   }
-  if (number == 71) { //C2
+  if (number == 93) { //C2
     masterBalance[1] = float(value) / 127;
-    parameters.set("master green", masterBalance[1]);  
+    parameters.set("master green", float(value) / 127);  
   }
-  if (number == 52) { //C3
+  if (number == 26) { //C3
     masterBalance[2] = float(value) / 127;  
-    parameters.set("master blue", masterBalance[2]);
+    parameters.set("master blue", float(value) / 127);
   }
 }
 
