@@ -17,3 +17,5 @@ Pikavalinnoissa ei yksittäisiä valoja, vaan komboja. Mietityt väriyhdistelmät.
 Valon tasonsäätö
 
 feidaava efektivalo
+
+Effects = True jää päälle??!
