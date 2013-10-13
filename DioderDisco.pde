@@ -127,6 +127,7 @@ void setup()
   //=================================
   
   midiBus = new MidiBus(this, "Oxygen 25", -1);
+  println("Connected to Oxygen 25 MIDI");
   
 }
 // end of setup
