@@ -83,6 +83,10 @@ void setup()
   parameters.set("sensitivity", SENSITIVITY);
   parameters.set("level part", LEVEL_PART);
   parameters.set("eff fader", EFFECT_FADER);
+  parameters.set("master level", masterLevel);
+  parameters.set("master red", masterLevel);
+  parameters.set("master green", masterLevel);
+  parameters.set("master blue", masterLevel);
   
   status = new FloatDict();
   
@@ -122,7 +126,7 @@ void setup()
   
   //=================================
   
-  midiBus = new MidiBus(this, 0, -1);
+  midiBus = new MidiBus(this, "Oxygen 25", -1);
   
 }
 // end of setup
@@ -164,7 +168,7 @@ void draw()
   
   // Scale with level settings
   for (int i = 0; i < 3; i++) {
-    masterRGB[i] = masterLevel * masterBalance[i] * masterRGB[i];
+    masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
   }
   
   colorMode(RGB, 255);
@@ -311,19 +315,22 @@ void noteOff(int channel, int pitch, int velocity) {
 
 void controllerChange(int channel, int number, int value) {
   if (number == 7) { //C9
-   masterLevel = float(value) / 127; 
+    parameters.set("master level", float(value) / 127);
   }
   if (number == 6) { //C8
     parameters.set("eff fader", float(value) / 127);
   }
   if (number == 74) { //C1
-    masterBalance[0] = float(value) / 127;  
+    masterBalance[0] = float(value) / 127;
+    parameters.set("master red", masterBalance[0]); 
   }
   if (number == 71) { //C2
-    masterBalance[1] = float(value) / 127;  
+    masterBalance[1] = float(value) / 127;
+    parameters.set("master green", masterBalance[1]);  
   }
   if (number == 52) { //C3
     masterBalance[2] = float(value) / 127;  
+    parameters.set("master blue", masterBalance[2]);
   }
 }
 
@@ -332,19 +339,22 @@ void controllerChange(int channel, int number, int value) {
 
 
 // stop
-//void stop()
-//{
-//  print("Shutting down . . . ");
-//  
-//  // Switch lights off
-//  driver.update(BLACK);
-//  
-//  // always close Minim audio classes when you are finished with them
-//  in.close();
-//  // always stop Minim before exiting
-//  minim.stop();
-//  // this closes the sketch
-//  super.stop();
-//  
-//  print("done. Goodbye!");
-//}
+void exit()
+{
+  print("Shutting down . . . ");
+  
+  // Switch lights off
+  driver.update(BLACK);
+  
+  // always close Minim audio classes when you are finished with them
+  in.close();
+  // always stop Minim before exiting
+  minim.stop();
+  // close MIDI bus
+  midiBus.close();
+  
+  print("done. Goodbye!\n");
+  
+  // this closes the sketch
+  super.exit();
+}
