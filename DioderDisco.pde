@@ -57,6 +57,8 @@ final int LTS_CONFIG_LINE_TOKENS = 4;
 final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
+final float STROBE = 0;
+final float STROBE_CONST = 1000;
 
 float masterLevel = 1;
 float[] masterBalance = {1, 1, 1};
@@ -87,6 +89,7 @@ void setup()
   parameters.set("master red", masterLevel);
   parameters.set("master green", masterLevel);
   parameters.set("master blue", masterLevel);
+  parameters.set("strobe", STROBE);
   
   status = new FloatDict();
   
@@ -333,6 +336,10 @@ void controllerChange(int channel, int number, int value) {
   if (number == 26) { //C3
     masterBalance[2] = float(value) / 127;  
     parameters.set("master blue", float(value) / 127);
+  }
+  if (number == 1) { //C17  
+    parameters.set("strobe", float(value) / 127 * STROBE_CONST);
+    effects.strobe = float(value) / 127 * STROBE_CONST;
   }
 }
 

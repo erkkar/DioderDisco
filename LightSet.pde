@@ -122,12 +122,15 @@ class BeatSet extends LightSet
 // EffectSet
 class EffectSet extends LightSet 
 {  
+  float strobe;
+  
   // Constructor
   EffectSet(int size) {
     super(size);
     for (int i = 0; i < size; i++) {
       theSet[i] = new LightThing(false, "effect", EFFECT_FADER, 0);
     }
+    strobe = 0;
   }
   
   void change(int index, float fader, float hue, float saturation, float brightness) {
@@ -148,4 +151,12 @@ class EffectSet extends LightSet
     }
     if (howMany == 0) enabled = false;
   }
+  
+  float[] mixRGB() {
+    if (strobe > 0 && millis() % strobe > 0.5 * strobe) {
+      return BLACK_RGB;
+    } else {
+      return super.mixRGB();
+    }
+  } 
 }
