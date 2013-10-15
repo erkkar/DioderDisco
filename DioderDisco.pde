@@ -187,7 +187,7 @@ void draw()
   driver.update();
   
   // Print status
-  printSomeValues(MARGIN, (int) height/2, 
+  printSomeValues(MARGIN, (int) 2/3 * height, 
                   status.keyArray(), nf(status.valueArray(), 1, 3));
                                   
   text("Beats: "+beatLights.enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
