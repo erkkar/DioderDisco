@@ -89,6 +89,7 @@ void setup()
   parameters.set("master red", masterLevel);
   parameters.set("master green", masterLevel);
   parameters.set("master blue", masterLevel);
+  parameters.set("saturation", MAX_SATURATION);
   parameters.set("strobe", STROBE);
   
   status = new FloatDict();
@@ -340,6 +341,9 @@ void controllerChange(int channel, int number, int value) {
   if (number == 1) { //C17  
     parameters.set("strobe", float(value) / 127 * STROBE_CONST);
     effects.strobe = float(value) / 127 * STROBE_CONST;
+  }
+  if (number == 30) { //C4  
+    parameters.set("saturation", float(value) / 127);
   }
 }
 
