@@ -302,8 +302,8 @@ void drawPreview() {
 void noteOn(int channel, int pitch, int velocity) {
   print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
   float hue, saturation, brightness;
-  hue = (float(pitch) % 12) * 30;
-  saturation = float(pitch) / 120 * MAX_SATURATION; 
+  hue = (float(pitch) % 24) * 15;
+  saturation = parameters.get("saturation"); 
   brightness = float(velocity) / 127;
   print("H: " + hue + " S: " + saturation + " B: + " + brightness + "\n");
   effects.change(pitch, parameters.get("eff fader"), hue, saturation, brightness);
