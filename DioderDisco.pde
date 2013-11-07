@@ -58,7 +58,7 @@ final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
 final float STROBE = 0;
-final float STROBE_CONST = 1000;
+final float STROBE_CONST = 500; // Max length of period (ms)
 
 float masterLevel = 1;
 float[] masterBalance = {1, 1, 1};
@@ -172,9 +172,11 @@ void draw()
   effects.clean();
   
   // Scale with level settings
-  for (int i = 0; i < 3; i++) {
-    masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
-    masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
+  if (effects.enabled || beatLights.enabled) {
+    for (int i = 0; i < 3; i++) {
+      masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
+      masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
+    }
   }
   
   colorMode(RGB, 255);
@@ -199,48 +201,35 @@ void draw()
 
 // keyPressed
 void keyPressed() {
-  
+  /*
   if (key == 44) { //,
-      
   }
   if (key == 46) { //.
-      
   }
-  if (key == 45) { //-
-      
+  if (key == 45) { //-   
   }
-  
   if (key == 8) { // Backsapce
-    beatLights.enabled = !beatLights.enabled; 
   }
   if (key == 10) { // Enter
   }       
-  // Re-read light configuration
-  if (key == 114) {  //r
-    beatLights.readConfig(LT_CONFIG);
+  if (key == 114) { //r
   }
-  if (key == 103) {  //g
-    parameters.mult("sensitivity",2);
-    beat.setSensitivity((int) parameters.get("sensitivity"));
+  if (key == 103) { //g
   }
-  if (key == 98) {  //b
-    parameters.div("sensitivity",2);
-    beat.setSensitivity((int) parameters.get("sensitivity")); 
+  if (key == 98) { //b 
   }
-  if (key == 97) {  //a
+  if (key == 97) { //a
   }
   if (key == 122) { //z
-    parameters.set("level part", constrain(parameters.get("level part") - 0.1, 0, 1));
   }
   if (key == 120) { //x
-    parameters.set("level part", constrain(parameters.get("level part") + 0.1, 0, 1));
   } 
-  
+  */
   // Switch LightThings on/off
   if (key == 48) { //0
       beatLights.enableAll();
   }
-  if (key == 43) { //0
+  if (key == 43) { //+
     beatLights.disableAll();
   }
   if (key >= 49 && key <= 57) {
@@ -320,39 +309,49 @@ void noteOff(int channel, int pitch, int velocity) {
 }
 
 void controllerChange(int channel, int number, int value) {  
-  println("Controller: " + str(number));
+  println("Controller: " + str(channel) +"/"+ str(number) +"/"+ str(value));
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
-  if (number == 76) { //C8
+  if (number == 84) { //C8
     parameters.set("eff fader", float(value) / 127);
   }
-  if (number == 91) { //C1
+  if (number == 74) { //C1
     masterBalance[0] = float(value) / 127;
     parameters.set("master red", float(value) / 127);
   }
-  if (number == 93) { //C2
+  if (number == 71) { //C2
     masterBalance[1] = float(value) / 127;
     parameters.set("master green", float(value) / 127);  
   }
-  if (number == 26) { //C3
+  if (number == 91) { //C3
     masterBalance[2] = float(value) / 127;  
     parameters.set("master blue", float(value) / 127);
   }
   if (number == 1) { //C17  
     parameters.set("strobe", float(value) / 127 * STROBE_CONST);
   }
-  if (number == 30) { //C4  
+  if (number == 93) { //C4  
     parameters.set("saturation", float(value) / 127);
   }
   if (number == 116) { //STOP  
-    effects.enabled = false;
+    if(value == 127) effects.kill();
   }
   if (number == 117) { //PLAY  
-    effects.enabled = true;
+    if(value == 127) effects.enabled = !effects.enabled;
+  }
+  if (number == 118) { //RECORD  
+    if(value == 127) beatLights.enabled = !beatLights.enabled;
   }
   if (number == 113) { //RECYCLE  
-    effects.kill();
+    if(value == 127) beatLights.readConfig(LT_CONFIG);
+  }
+  if (number == 73) { //C5  
+    parameters.set("sensitivity",pow(10,float(value)/127*3));
+    beat.setSensitivity((int) parameters.get("sensitivity"));
+  }
+  if (number == 72) { //C6  
+    parameters.set("level part", float(value) / 127); 
   }
 }
 
