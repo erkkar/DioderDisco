@@ -147,7 +147,7 @@ class EffectSet extends LightSet
   void clean() {
     int howMany = 0;
     for (LightThing lt : theSet) {
-      if (lt.intensity < INTENSITY_THRESHOLD) howMany++;
+      if (lt.intensity > INTENSITY_THRESHOLD) howMany++;
     }
     if (howMany == 0) enabled = false;
   }
