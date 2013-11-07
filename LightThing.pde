@@ -49,7 +49,7 @@ class LightThing
   }
   
   // fade
-  void fade() {
+  void fade(float fader) {
     intensity = constrain(intensity * fader, 0, brightness); 
   }
   
@@ -100,7 +100,7 @@ class KickThing extends LightThing
     if ( beat.isKick() ) { 
       super.beat(level);
     } else {
-      super.fade();
+      super.fade(this.fader);
     }
   }
 }
@@ -118,7 +118,7 @@ class SnareThing extends LightThing
     if ( beat.isSnare() ) {
       super.beat(level);
     } else {
-      super.fade();
+      super.fade(this.fader);
     }
   }
 }
@@ -136,7 +136,7 @@ class HatThing extends LightThing
     if ( beat.isHat() ) {
       super.beat(level);
     } else {
-      super.fade();
+      super.fade(this.fader);
     }
   }
 }

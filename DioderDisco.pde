@@ -168,7 +168,7 @@ void draw()
     masterRGB = BLACK_RGB;
   }  
   // Fade & clean effects
-  effects.fadeAll();
+  effects.fadeAll(parameters.get("eff fader"));
   effects.clean();
   
   // Scale with level settings
@@ -309,7 +309,7 @@ void noteOn(int channel, int pitch, int velocity) {
   hue = (float(pitch) % 24) * 15;
   saturation = parameters.get("saturation"); 
   brightness = float(velocity) / 127;
-  print("H: " + hue + " S: " + saturation + " B: + " + brightness + "\n");
+  //print("H: " + hue + " S: " + saturation + " B: + " + brightness + "\n");
   effects.change(pitch, parameters.get("eff fader"), hue, saturation, brightness);
 }
 
@@ -344,6 +344,15 @@ void controllerChange(int channel, int number, int value) {
   }
   if (number == 30) { //C4  
     parameters.set("saturation", float(value) / 127);
+  }
+  if (number == 116) { //STOP  
+    effects.enabled = false;
+  }
+  if (number == 117) { //PLAY  
+    effects.enabled = true;
+  }
+  if (number == 113) { //RECYCLE  
+    effects.kill();
   }
 }
 

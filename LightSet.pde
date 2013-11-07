@@ -53,7 +53,7 @@ class LightSet
   
   void fadeAll() {
     for (LightThing lt : theSet) {
-      if (lt != null) lt.fade();
+      if (lt != null) lt.fade(lt.fader);
     }
   }
   
@@ -76,7 +76,7 @@ class BeatSet extends LightSet
         if ( level > LEVEL_THRESHOLD ) {
           lt.beat(level);
         } else { 
-          lt.fade(); 
+          lt.fade(lt.fader); 
         }  
      }
   }
@@ -138,9 +138,9 @@ class EffectSet extends LightSet
     theSet[index].change(fader, hue, saturation, brightness);
   }
   
-  void fadeAll() {
+  void fadeAll(float fader) {
     for (LightThing lt : theSet) {
-      if (lt != null && !lt.enabled) lt.fade();
+      if (lt != null && !lt.enabled) lt.fade(fader);
     }
   }
   
@@ -159,4 +159,11 @@ class EffectSet extends LightSet
       return super.mixRGB();
     }
   } 
+  
+  void kill() {
+    enabled = false;
+    for (LightThing lt : theSet) {
+      lt.intensity = 0;
+    }
+  }
 }
