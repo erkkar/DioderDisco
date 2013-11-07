@@ -6,16 +6,9 @@ Minim <http://code.compartmental.net/tools/minim/>
 
 Ei vitussa mit‰‰n erilisi‰ olioita. Kaikki tyypit on samoja, mutta tyyppiparametri muttuu.
 
-Loperus pit‰‰ mietti‰, valot ei sammu.
-
 Efektivalot (valk., sin, pun. jne.) vois linkitt‰‰ ‰‰nentasoon.
 
 Pikavalinnoissa ei yksitt‰isi‰ valoja, vaan komboja. Mietityt v‰riyhdistelm‰t.
 
-ƒ‰nentson yhteys valoihin?
 
-Valon tasons‰‰tˆ
-
-feidaava efektivalo
-
-Effects = True j‰‰ p‰‰lle??!
+k‰yt‰ norm()

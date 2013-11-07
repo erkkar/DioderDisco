@@ -36,7 +36,7 @@ int activeLTs;
 final int MAX_HUE = 360;
 final float MAX_SATURATION = 1;
 final float MAX_BRIGHTNESS = 1;
-final float INTENSITY_THRESHOLD = 0.01;
+final float INTENSITY_THRESHOLD = 0.005;
 
 color masterColor;
 float[] masterRGB;
@@ -158,7 +158,7 @@ void draw()
           + (1 - parameters.get("level part"));
   
   if (effects.enabled) {
-    masterRGB = effects.mixRGB();
+    masterRGB = effects.mixRGB(parameters.get("strobe"));
   } else if (beatLights.enabled) {
     // Update lights
     beatLights.update(status.get("level"));
@@ -304,7 +304,7 @@ void drawPreview() {
 // ------------------------------------------------------------------------
 // MIDI Control
 void noteOn(int channel, int pitch, int velocity) {
-  print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
+  //print("Pitch: " + pitch + "  Velocity: " + velocity + "\n");
   float hue, saturation, brightness;
   hue = (float(pitch) % 24) * 15;
   saturation = parameters.get("saturation"); 
@@ -315,11 +315,11 @@ void noteOn(int channel, int pitch, int velocity) {
 
 void noteOff(int channel, int pitch, int velocity) {
   effects.disable(pitch);
-  print("OFF: " + pitch + "\n");
+  //print("OFF: " + pitch + "\n");
 }
 
 void controllerChange(int channel, int number, int value) {  
-  println("Controller: " + str(number));
+  //println("Controller: " + str(number));
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
@@ -340,7 +340,6 @@ void controllerChange(int channel, int number, int value) {
   }
   if (number == 1) { //C17  
     parameters.set("strobe", float(value) / 127 * STROBE_CONST);
-    effects.strobe = float(value) / 127 * STROBE_CONST;
   }
   if (number == 30) { //C4  
     parameters.set("saturation", float(value) / 127);
