@@ -174,6 +174,7 @@ void draw()
   // Scale with level settings
   for (int i = 0; i < 3; i++) {
     masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
+    masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
   }
   
   colorMode(RGB, 255);
@@ -319,7 +320,7 @@ void noteOff(int channel, int pitch, int velocity) {
 }
 
 void controllerChange(int channel, int number, int value) {  
-  //println("Controller: " + str(number));
+  println("Controller: " + str(number));
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
