@@ -1,5 +1,6 @@
 class DioderDriver {
   int r,g,b;
+  int strobe;
   
   Serial serial;
   
@@ -11,6 +12,7 @@ class DioderDriver {
     r = 0;
     g = 0;
     b = 0;
+    strobe = 0;
     
     try {
       String portName = Serial.list()[0];
@@ -27,10 +29,11 @@ class DioderDriver {
   void update() {
     // Write to serial if connected
     if (!dummyMode) {
-      serial.clear();
       serial.write(r);
       serial.write(g);
       serial.write(b);
+      serial.write(0);  // DEBUG
+      serial.clear();
     }
   }
   

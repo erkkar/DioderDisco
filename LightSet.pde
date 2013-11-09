@@ -147,14 +147,6 @@ class EffectSet extends LightSet
       if (lt.intensity > INTENSITY_THRESHOLD) howMany++;
     }
     if (howMany == 0) enabled = false;
-  }
-  
-  float[] mixRGB(float strobe) {
-    if (strobe > 0 && millis() % strobe > 0.5 * strobe) {
-      return BLACK_RGB;
-    } else {
-      return super.mixRGB();
-    }
   } 
   
   void kill() {

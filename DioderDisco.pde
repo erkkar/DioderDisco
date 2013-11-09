@@ -58,7 +58,7 @@ final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
 final float STROBE = 0;
-final float STROBE_CONST = 500; // Max length of period (ms)
+final float STROBE_CONST = 1000; // Max length of period (ms)
 
 float masterLevel = 1;
 float[] masterBalance = {1, 1, 1};
@@ -158,13 +158,15 @@ void draw()
           + (1 - parameters.get("level part"));
   
   if (effects.enabled) {
-    masterRGB = effects.mixRGB(parameters.get("strobe"));
+    masterRGB = effects.mixRGB();
   } else if (beatLights.enabled) {
     // Update lights
+    driver.strobe = 0;
     beatLights.update(status.get("level"));
     // Mix master color
     masterRGB = beatLights.mixRGB();
   } else {
+    driver.strobe = 0;
     masterRGB = BLACK_RGB;
   }  
   // Fade & clean effects
@@ -181,7 +183,6 @@ void draw()
   
   colorMode(RGB, 255);
   masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
-  
   
   // DioderDriver
   driver.r = int(masterRGB[0]);
@@ -309,7 +310,7 @@ void noteOff(int channel, int pitch, int velocity) {
 }
 
 void controllerChange(int channel, int number, int value) {  
-  println("Controller: " + str(channel) +"/"+ str(number) +"/"+ str(value));
+  //println("Controller: " + str(channel) +"/"+ str(number) +"/"+ str(value));
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
@@ -329,7 +330,8 @@ void controllerChange(int channel, int number, int value) {
     parameters.set("master blue", float(value) / 127);
   }
   if (number == 1) { //C17  
-    parameters.set("strobe", float(value) / 127 * STROBE_CONST);
+    driver.strobe = value;
+    parameters.set("strobe", value);
   }
   if (number == 93) { //C4  
     parameters.set("saturation", float(value) / 127);
