@@ -131,7 +131,7 @@ void setup()
   //=================================
   
   midiBus = new MidiBus(this, "Oxygen 25", -1);
-  println("Connected to Oxygen 25 MIDI");
+  //println("Connected to Oxygen 25 MIDI");
   
 }
 // end of setup
@@ -238,6 +238,7 @@ void keyPressed() {
   }
   if (key == 112) { //p
     preview = !preview;
+    if (preview) println("Preview ON"); else println("Preview OFF");
   }
 }
 
@@ -332,6 +333,7 @@ void controllerChange(int channel, int number, int value) {
   if (number == 1) { //C17  
     driver.strobe = value;
     parameters.set("strobe", value);
+    driver.update();
   }
   if (number == 93) { //C4  
     parameters.set("saturation", float(value) / 127);

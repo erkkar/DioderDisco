@@ -1,5 +1,5 @@
 class DioderDriver {
-  int r,g,b;
+  int r, g, b;
   int strobe;
   
   Serial serial;
