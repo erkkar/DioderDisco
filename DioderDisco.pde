@@ -28,6 +28,8 @@ final float LEVEL_THRESHOLD = 0.005;
 FloatDict parameters;
 FloatDict status;
 
+final int DECIMALS = 2;
+
 boolean preview = true;
 
 int activeLTs;
@@ -145,7 +147,7 @@ void draw()
   fill(WHITE);
   textSize(TEXT_SIZE);
   printSomeValues(MARGIN, MARGIN, 
-                  parameters.keyArray(), nf(parameters.valueArray(), 1, 1));
+                  parameters.keyArray(), nf(parameters.valueArray(), 1, DECIMALS));
   printThings(beatLights.theSet, MARGIN);
   printThings(effects.theSet, height/2);
   
@@ -331,9 +333,7 @@ void controllerChange(int channel, int number, int value) {
     parameters.set("master blue", float(value) / 127);
   }
   if (number == 1) { //C17  
-    driver.strobe = value;
     parameters.set("strobe", value);
-    driver.update();
   }
   if (number == 93) { //C4  
     parameters.set("saturation", float(value) / 127);
