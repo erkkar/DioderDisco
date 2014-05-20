@@ -10,5 +10,7 @@ Efektivalot (valk., sin, pun. jne.) vois linkittää äänentasoon.
 
 Pikavalinnoissa ei yksittäisiä valoja, vaan komboja. Mietityt väriyhdistelmät.
 
+Säätö, jolla voi muokata beat-efektien vaimenemista
+
 
 käytä norm()
