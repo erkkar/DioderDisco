@@ -1,7 +1,8 @@
 //import java.util.LinkedList;
 
 class LightSet
-{
+{ 
+  String name;
   boolean enabled;
   LightThing[] theSet;
   
@@ -57,8 +58,9 @@ class LightSet
     }
   }
   
-  void flip(int index) {
-    if (index < theSet.length) theSet[index].flip();
+  // flip
+  void flip() { 
+    enabled = !enabled; 
   }
 }
 
@@ -86,6 +88,17 @@ class BeatSet extends LightSet
     BufferedReader LTconfig = createReader(filename);
     String line;
     String[] config = {};
+    
+    // Get name on first line      
+    try {
+      line = LTconfig.readLine();
+    } catch (IOException e) {
+      line = null;
+    }
+    if (line == null || line.equals("")) return;
+    else name = line;
+    
+    // Read effect config from rest of the file
     while (true) {
       try {
         line = LTconfig.readLine();
@@ -99,15 +112,15 @@ class BeatSet extends LightSet
       // Check correct length
       if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
       
-      switch(config[1].charAt(0)) {
+      switch(config[0].charAt(0)) {
         case 'k':
-          theSet = (LightThing[]) append(theSet, new KickThing(config[0], float(config[2]), float(config[3])));
+          theSet = (LightThing[]) append(theSet, new KickThing(float(config[1]), float(config[2])));
           break;
         case 's':
-          theSet = (LightThing[]) append(theSet, new SnareThing(config[0], float(config[2]), float(config[3])));
+          theSet = (LightThing[]) append(theSet, new SnareThing(float(config[1]), float(config[2])));
           break;
         case 'h':
-          theSet = (LightThing[]) append(theSet, new HatThing(config[0], float(config[2]), float(config[3])));
+          theSet = (LightThing[]) append(theSet, new HatThing(float(config[1]), float(config[2])));
           break;
       }
     }
@@ -126,7 +139,7 @@ class EffectSet extends LightSet
   EffectSet(int size) {
     super(size);
     for (int i = 0; i < size; i++) {
-      theSet[i] = new LightThing(false, "effect", EFFECT_FADER, 0);
+      theSet[i] = new LightThing(false, EFFECT_FADER, 0);
     }
   }
   

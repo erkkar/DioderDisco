@@ -15,10 +15,10 @@ class LightThing
   float R, G, B;
   
   // Constructor
-  LightThing(boolean status, String comment, float fader, float hue) 
+  LightThing(boolean status, float fader, float hue) 
   {
     enabled = status;
-    this.comment = comment;
+    this.comment = "";
     this.fader = fader;
     this.hue = hue;
     this.saturation = MAX_SATURATION;
@@ -92,8 +92,8 @@ class LightThing
 class KickThing extends LightThing
 {
   // Constructor
-  KickThing(String comment, float fader, float hue) {
-    super(true, comment, fader, hue); 
+  KickThing(float fader, float hue) {
+    super(true, fader, hue); 
   }
   
   void beat(float level) {
@@ -110,8 +110,8 @@ class KickThing extends LightThing
 class SnareThing extends LightThing
 {
   // Constructor
-  SnareThing(String comment, float fader, float hue) {
-    super(true, comment, fader, hue); 
+  SnareThing(float fader, float hue) {
+    super(true, fader, hue); 
   }
   
   void beat(float level) {
@@ -128,8 +128,8 @@ class SnareThing extends LightThing
 class HatThing extends LightThing 
 {
   // Constructor
-  HatThing(String comment, float fader, float hue) {
-    super(true, comment, fader, hue); 
+  HatThing(float fader, float hue) {
+    super(true, fader, hue); 
   }
   
   void beat(float level) {
@@ -148,7 +148,6 @@ class HatThing extends LightThing
 //  // Constructor
 //  EffectThing(float hue, float saturation, float brightness) {
 //    enabled = status;
-//    this.comment = "";
 //    this.fader = EFFECT_FADER;
 //    this.hue = hue;
 //    this.saturation = saturation;

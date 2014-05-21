@@ -14,6 +14,7 @@ BeatDetect   beat;
 BeatListener bl;
 DioderDriver driver;
 
+BeatSet[] beatSets;
 BeatSet beatLights;
 EffectSet effects;
 
@@ -43,7 +44,7 @@ final float INTENSITY_THRESHOLD = 0.005;
 color masterColor;
 float[] masterRGB;
 
-color WHITE, BLACK, RED, GREEN, BLUE;
+color WHITE, BLACK, GREY, RED, GREEN, BLUE;
 float[] BLACK_RGB = {0, 0, 0};
 
 final int WIDTH = 500;
@@ -53,7 +54,7 @@ final int TEXT_SIZE = 20;
 final int RECT_SIZE = 100;
 
 final String LT_CONFIG = "LTs.cfg";
-final int LTS_CONFIG_LINE_TOKENS = 4;
+final int LTS_CONFIG_LINE_TOKENS = 3;
 
 // Startup parameters
 final float SENSITIVITY = 100.0;
@@ -67,6 +68,15 @@ float[] masterBalance = {1, 1, 1};
 
 MidiBus midiBus; // The MidiBus
 
+final String LTS_CONFIG_DIR = "effects";
+
+// let's set a filter (which returns true if file's extension is .lts)
+java.io.FilenameFilter ltsFilter = new java.io.FilenameFilter() {
+  boolean accept(File dir, String name) {
+    return name.toLowerCase().endsWith(".lts");
+  }
+};
+
 // setup
 void setup()
 {
@@ -74,6 +84,7 @@ void setup()
   
   // Define static colors
   WHITE = color(255, 255, 255);
+  GREY = color(128, 128, 128);
   BLACK = color(0, 0, 0);
   RED = color(255, 0, 0);
   GREEN = color(0, 255, 0);
@@ -125,8 +136,8 @@ void setup()
    
   //=================================
   // Init LightThings
-  beatLights = new BeatSet();
-  beatLights.readConfig(LT_CONFIG);
+  beatSets = readBeatConfig();
+  beatLights = beatSets[0];
   
   effects = new EffectSet(128);
   
@@ -148,7 +159,7 @@ void draw()
   textSize(TEXT_SIZE);
   printSomeValues(MARGIN, MARGIN, 
                   parameters.keyArray(), nf(parameters.valueArray(), 1, DECIMALS));
-  printThings(beatLights.theSet, MARGIN);
+  printSets(beatSets, MARGIN);
   printThings(effects.theSet, height/2);
   
   //Print preview
@@ -215,8 +226,6 @@ void keyPressed() {
   }
   if (key == 10) { // Enter
   }       
-  if (key == 114) { //r
-  }
   if (key == 103) { //g
   }
   if (key == 98) { //b 
@@ -235,12 +244,15 @@ void keyPressed() {
   if (key == 43) { //+
     beatLights.disableAll();
   }
-  if (key >= 49 && key <= 57) {
-    beatLights.flip(key - 49);
+  if (key >= 49 && key <= 57) { // 1...9
+    if (key - 49 < beatSets.length) beatSets[key - 49].flip();
   }
   if (key == 112) { //p
     preview = !preview;
     if (preview) println("Preview ON"); else println("Preview OFF");
+  }
+  if (key == 114) { //r
+    readBeatConfig();
   }
 }
 
@@ -248,6 +260,25 @@ void keyPressed() {
 // keyReleased
 void keyReleased() {   
   
+}
+
+BeatSet[] readBeatConfig() {
+  print("Reading effects...");
+  // we'll have a look in the data folder
+  File folder = new File(dataPath(""));
+  
+  // list the files in the data folder, passing the filter as parameter
+  String[] filenames = folder.list(ltsFilter);
+ 
+  BeatSet[] sets;
+  sets = new BeatSet[filenames.length];
+   
+  for (int i = 0; i < filenames.length; i++) {
+    sets[i] = new BeatSet();
+    sets[i].readConfig(dataPath(filenames[i]));
+  }
+  println(filenames.length + " files read.");
+  return sets;
 }
 
 
@@ -280,6 +311,26 @@ void printThings(LightThing[] lts, int yPos) {
     if (lt != null && lt.enabled) { 
       fill(lt.getOrigColor());
       text(nf(i + 1,1,0) + ": " + lt.comment, width - COLUM_WIDTH, yPos);
+      yPos = int(yPos + LINESPREAD * TEXT_SIZE);
+    }
+    i++;
+  }
+}
+
+// printSets
+void printSets(LightSet[] lts, int yPos) {
+  
+  int COLUM_WIDTH = 200;
+  float LINESPREAD = 1.1;
+  
+  textAlign(LEFT);
+  
+  int i = 0;
+  
+  for (LightSet ls : lts) {
+    if (ls != null) {
+      if (ls.enabled) fill(WHITE); else fill(GREY); 
+      text(nf(i + 1,1,0) + ": " + ls.name, width - COLUM_WIDTH, yPos);
       yPos = int(yPos + LINESPREAD * TEXT_SIZE);
     }
     i++;
