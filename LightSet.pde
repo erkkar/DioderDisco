@@ -58,10 +58,18 @@ class LightSet
     }
   }
   
-  // flip
+  // enable & disable & flip
+  void enable() { 
+    enabled = true; 
+  }
+  void disable() { 
+    enabled = false; 
+  }
   void flip() { 
     enabled = !enabled; 
   }
+
+  
 }
 
 
@@ -71,14 +79,15 @@ class BeatSet extends LightSet
   // Constructor
   BeatSet() {
     super(0);
+    enabled = false;
   }
   
-  void update(float level) {
+  void update(float level, float faderScaling) {
     for (LightThing lt : theSet) {
         if ( level > LEVEL_THRESHOLD ) {
           lt.beat(level);
         } else { 
-          lt.fade(lt.fader); 
+          lt.fade(constrain(faderScaling * lt.fader, 0.0, 1.0)); 
         }  
      }
   }
@@ -123,10 +132,6 @@ class BeatSet extends LightSet
           theSet = (LightThing[]) append(theSet, new HatThing(float(config[1]), float(config[2])));
           break;
       }
-    }
-    if (theSet.length > 0) {
-      enabled = true;
-      println("Total Light Things read: " + theSet.length);
     }
   }
 }

@@ -15,7 +15,7 @@ BeatListener bl;
 DioderDriver driver;
 
 BeatSet[] beatSets;
-BeatSet beatLights;
+int activeBeatSet = 0;
 EffectSet effects;
 
 // Sound volume
@@ -60,6 +60,7 @@ final int LTS_CONFIG_LINE_TOKENS = 3;
 final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
+final float BEAT_FADER_SCALE = 1;
 final float STROBE = 0;
 final float STROBE_CONST = 1000; // Max length of period (ms)
 
@@ -98,6 +99,7 @@ void setup()
   parameters.set("sensitivity", SENSITIVITY);
   parameters.set("level part", LEVEL_PART);
   parameters.set("eff fader", EFFECT_FADER);
+  parameters.set("beat fader scale", BEAT_FADER_SCALE);
   parameters.set("master level", masterLevel);
   parameters.set("master red", masterLevel);
   parameters.set("master green", masterLevel);
@@ -137,7 +139,6 @@ void setup()
   //=================================
   // Init LightThings
   beatSets = readBeatConfig();
-  beatLights = beatSets[0];
   
   effects = new EffectSet(128);
   
@@ -172,12 +173,12 @@ void draw()
   
   if (effects.enabled) {
     masterRGB = effects.mixRGB();
-  } else if (beatLights.enabled) {
+  } else if (beatSets[activeBeatSet].enabled) {
     // Update lights
     driver.strobe = 0;
-    beatLights.update(status.get("level"));
+    beatSets[activeBeatSet].update(status.get("level"), parameters.get("beat fader scale"));
     // Mix master color
-    masterRGB = beatLights.mixRGB();
+    masterRGB = beatSets[activeBeatSet].mixRGB();
   } else {
     driver.strobe = 0;
     masterRGB = BLACK_RGB;
@@ -187,7 +188,7 @@ void draw()
   effects.clean();
   
   // Scale with level settings
-  if (effects.enabled || beatLights.enabled) {
+  if (effects.enabled || beatSets[activeBeatSet].enabled) {
     for (int i = 0; i < 3; i++) {
       masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
       masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
@@ -207,7 +208,7 @@ void draw()
   printSomeValues(MARGIN, (int) 2/3 * height, 
                   status.keyArray(), nf(status.valueArray(), 1, 3));
                                   
-  text("Beats: "+beatLights.enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
+  text("Beats: "+beatSets[activeBeatSet].enabled, MARGIN, height - MARGIN - 2.2*TEXT_SIZE);
   text("Effects: "+effects.enabled, MARGIN, height - MARGIN - TEXT_SIZE);
 }
 // end of draw
@@ -215,6 +216,7 @@ void draw()
 
 // keyPressed
 void keyPressed() {
+  //println("Key: " + int(key));
   /*
   if (key == 44) { //,
   }
@@ -239,20 +241,23 @@ void keyPressed() {
   */
   // Switch LightThings on/off
   if (key == 48) { //0
-      beatLights.enableAll();
+     beatSets[activeBeatSet].disable();
   }
   if (key == 43) { //+
-    beatLights.disableAll();
   }
   if (key >= 49 && key <= 57) { // 1...9
-    if (key - 49 < beatSets.length) beatSets[key - 49].flip();
+    if (key - 49 <= beatSets.length) {
+        beatSets[activeBeatSet].disable();
+        activeBeatSet = key - 49; 
+        beatSets[activeBeatSet].enable();
+    }
   }
   if (key == 112) { //p
     preview = !preview;
     if (preview) println("Preview ON"); else println("Preview OFF");
   }
   if (key == 114) { //r
-    readBeatConfig();
+    beatSets = readBeatConfig();
   }
 }
 
@@ -269,6 +274,7 @@ BeatSet[] readBeatConfig() {
   
   // list the files in the data folder, passing the filter as parameter
   String[] filenames = folder.list(ltsFilter);
+  if (filenames.length > 9) println("Too many effect configs, only first 9 loaded!");
  
   BeatSet[] sets;
   sets = new BeatSet[filenames.length];
@@ -330,7 +336,7 @@ void printSets(LightSet[] lts, int yPos) {
   for (LightSet ls : lts) {
     if (ls != null) {
       if (ls.enabled) fill(WHITE); else fill(GREY); 
-      text(nf(i + 1,1,0) + ": " + ls.name, width - COLUM_WIDTH, yPos);
+      text(nf(i + 1, 1, 0) + ": " + ls.name, width - COLUM_WIDTH, yPos);
       yPos = int(yPos + LINESPREAD * TEXT_SIZE);
     }
     i++;
@@ -396,10 +402,10 @@ void controllerChange(int channel, int number, int value) {
     if(value == 127) effects.enabled = !effects.enabled;
   }
   if (number == 118) { //RECORD  
-    if(value == 127) beatLights.enabled = !beatLights.enabled;
+    if(value == 127) beatSets[activeBeatSet].flip();
   }
   if (number == 113) { //RECYCLE  
-    if(value == 127) beatLights.readConfig(LT_CONFIG);
+    if(value == 127) beatSets = readBeatConfig();
   }
   if (number == 73) { //C5  
     parameters.set("sensitivity",pow(10,float(value)/127*3));
