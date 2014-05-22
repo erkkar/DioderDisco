@@ -4,7 +4,6 @@ Dioder Disco
 
 import ddf.minim.*;
 import ddf.minim.analysis.*;
-import processing.serial.*;
 import themidibus.*;
 
 Minim        minim;
@@ -31,7 +30,7 @@ FloatDict status;
 
 final int DECIMALS = 2;
 
-boolean preview = true;
+boolean preview = false;
 
 int activeLTs;
 
@@ -175,12 +174,10 @@ void draw()
     masterRGB = effects.mixRGB();
   } else if (beatSets[activeBeatSet].enabled) {
     // Update lights
-    driver.strobe = 0;
     beatSets[activeBeatSet].update(status.get("level"), parameters.get("beat fader scale"));
     // Mix master color
     masterRGB = beatSets[activeBeatSet].mixRGB();
   } else {
-    driver.strobe = 0;
     masterRGB = BLACK_RGB;
   }  
   // Fade & clean effects
@@ -199,10 +196,7 @@ void draw()
   masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
   
   // DioderDriver
-  driver.r = int(masterRGB[0]);
-  driver.g = int(masterRGB[1]);
-  driver.b = int(masterRGB[2]);
-  driver.update();
+  driver.update(int(masterRGB[0]), int(masterRGB[1]), int(masterRGB[2]));
   
   // Print status
   printSomeValues(MARGIN, (int) 2/3 * height, 
