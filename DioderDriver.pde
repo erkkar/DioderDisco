@@ -47,4 +47,8 @@ class DioderDriver {
     update();
 
   }
+  
+  void close() {
+    if (!dummyMode) serial.stop();
+  }
 };

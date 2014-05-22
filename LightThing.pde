@@ -88,55 +88,28 @@ class LightThing
 }
 
 
-// KickThing
-class KickThing extends LightThing
+// BeatThing
+class BeatThing extends LightThing
 {
+  char type;
+  
   // Constructor
-  KickThing(float fader, float hue) {
-    super(true, fader, hue); 
+  BeatThing(char type, float fader, float hue) {
+    super(true, fader, hue);
+    this.type = type; 
   }
   
-  void beat(float level) {
-    if ( beat.isKick() ) { 
-      super.beat(level);
-    } else {
-      super.fade(this.fader);
-    }
-  }
-}
-
-
-//SnareThing
-class SnareThing extends LightThing
-{
-  // Constructor
-  SnareThing(float fader, float hue) {
-    super(true, fader, hue); 
-  }
-  
-  void beat(float level) {
-    if ( beat.isSnare() ) {
-      super.beat(level);
-    } else {
-      super.fade(this.fader);
-    }
-  }
-}
-
-
-// HatThing
-class HatThing extends LightThing 
-{
-  // Constructor
-  HatThing(float fader, float hue) {
-    super(true, fader, hue); 
-  }
-  
-  void beat(float level) {
-    if ( beat.isHat() ) {
-      super.beat(level);
-    } else {
-      super.fade(this.fader);
+  void beat(float level, float scaledFader) {
+    switch(type) {
+      case 'k':
+        if (beat.isKick()) super.beat(level); else super.fade(scaledFader);
+        break;
+      case 's':
+        if (beat.isKick()) super.beat(level); else super.fade(scaledFader);
+        break;
+      case 'h':
+        if (beat.isKick()) super.beat(level); else super.fade(scaledFader);
+        break;
     }
   }
 }

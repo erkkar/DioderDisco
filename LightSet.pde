@@ -1,5 +1,4 @@
-//import java.util.LinkedList;
-
+// LightSet
 class LightSet
 { 
   String name;
@@ -67,9 +66,7 @@ class LightSet
   }
   void flip() { 
     enabled = !enabled; 
-  }
-
-  
+  } 
 }
 
 
@@ -83,20 +80,23 @@ class BeatSet extends LightSet
   }
   
   void update(float level, float faderScaling) {
-    for (LightThing lt : theSet) {
+    float scaledFader;
+    for (BeatThing lt : (BeatThing[]) theSet) {
+      scaledFader = constrain(faderScaling * lt.fader, 0.01, 0.99);
         if ( level > LEVEL_THRESHOLD ) {
-          lt.beat(level);
-        } else { 
-          lt.fade(constrain(faderScaling * lt.fader, 0.0, 1.0)); 
+          lt.beat(level, scaledFader);
+        } else {
+          lt.fade(scaledFader); 
         }  
      }
   }
 
   void readConfig(String filename) {
-    theSet = new LightThing[0];
+    theSet = new BeatThing[0];
     BufferedReader LTconfig = createReader(filename);
     String line;
     String[] config = {};
+    char type;
     
     // Get name on first line      
     try {
@@ -121,20 +121,12 @@ class BeatSet extends LightSet
       // Check correct length
       if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
       
-      switch(config[0].charAt(0)) {
-        case 'k':
-          theSet = (LightThing[]) append(theSet, new KickThing(float(config[1]), float(config[2])));
-          break;
-        case 's':
-          theSet = (LightThing[]) append(theSet, new SnareThing(float(config[1]), float(config[2])));
-          break;
-        case 'h':
-          theSet = (LightThing[]) append(theSet, new HatThing(float(config[1]), float(config[2])));
-          break;
-      }
+      type = config[0].charAt(0);
+      theSet = (BeatThing[]) append(theSet, new BeatThing(type, float(config[1]), float(config[2])));
     }
   }
 }
+
 
 
 // EffectSet

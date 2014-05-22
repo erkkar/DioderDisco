@@ -374,6 +374,9 @@ void controllerChange(int channel, int number, int value) {
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
+  if (number == 5) { //C7
+    parameters.set("beat fader scale", 2 * float(value) / 127);
+  }
   if (number == 84) { //C8
     parameters.set("eff fader", float(value) / 127);
   }
@@ -427,6 +430,7 @@ void exit()
   
   // Switch lights off
   driver.update(BLACK);
+  driver.close();
   
   // always close Minim audio classes when you are finished with them
   in.close();

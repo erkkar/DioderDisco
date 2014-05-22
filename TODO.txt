@@ -4,13 +4,4 @@ GUI: controlP5 <http://www.sojamo.de/libraries/controlP5/>
 
 Minim <http://code.compartmental.net/tools/minim/>
 
-Ei vitussa mit‰‰n erilisi‰ olioita. Kaikki tyypit on samoja, mutta tyyppiparametri muttuu.
-
-Efektivalot (valk., sin, pun. jne.) vois linkitt‰‰ ‰‰nentasoon.
-
-Pikavalinnoissa ei yksitt‰isi‰ valoja, vaan komboja. Mietityt v‰riyhdistelm‰t.
-
-S‰‰tˆ, jolla voi muokata beat-efektien vaimenemista
-
-
 k‰yt‰ norm()
