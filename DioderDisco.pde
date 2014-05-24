@@ -4,11 +4,9 @@ Dioder Disco
 
 import ddf.minim.*;
 import ddf.minim.analysis.*;
-import processing.serial.*;
 import themidibus.*;
 
 Minim        minim;
-//AudioPlayer  in;
 AudioInput   in;
 BeatDetect   beat;
 BeatListener bl;
@@ -31,9 +29,7 @@ FloatDict status;
 
 final int DECIMALS = 2;
 
-boolean preview = true;
-
-int activeLTs;
+boolean preview = false;
 
 // Colour settings
 final int MAX_HUE = 360;
@@ -68,6 +64,7 @@ float masterLevel = 1;
 float[] masterBalance = {1, 1, 1};
 
 MidiBus midiBus; // The MidiBus
+final String MIDI_DEVICE = "Oxygen 25";
 
 final String LTS_CONFIG_DIR = "effects";
 
@@ -114,8 +111,6 @@ void setup()
   minim = new Minim(this);
   
   in = minim.getLineIn();
-  //in = minim.loadFile("sample.mp3");
-  //in.loop();
   
   // a beat detection object that is FREQ_ENERGY mode that 
   // expects buffers the length of song's buffer size
@@ -144,8 +139,8 @@ void setup()
   
   //=================================
   
-  midiBus = new MidiBus(this, "Oxygen 25", -1);
-  //println("Connected to Oxygen 25 MIDI");
+
+  midiBus = new MidiBus(this, MIDI_DEVICE, -1);
   
 }
 // end of setup
@@ -175,12 +170,10 @@ void draw()
     masterRGB = effects.mixRGB();
   } else if (beatSets[activeBeatSet].enabled) {
     // Update lights
-    driver.strobe = 0;
     beatSets[activeBeatSet].update(status.get("level"), parameters.get("beat fader scale"));
     // Mix master color
     masterRGB = beatSets[activeBeatSet].mixRGB();
   } else {
-    driver.strobe = 0;
     masterRGB = BLACK_RGB;
   }  
   // Fade & clean effects
@@ -199,10 +192,13 @@ void draw()
   masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
   
   // DioderDriver
-  driver.r = int(masterRGB[0]);
-  driver.g = int(masterRGB[1]);
-  driver.b = int(masterRGB[2]);
+  driver.r = byte(masterRGB[0]);
+  driver.g = byte(masterRGB[1]);
+  driver.b = byte(masterRGB[2]);
+  
   driver.update();
+  
+  parameters.set("strip mode", driver.strip_mode);
   
   // Print status
   printSomeValues(MARGIN, (int) 2/3 * height, 
@@ -217,15 +213,19 @@ void draw()
 // keyPressed
 void keyPressed() {
   //println("Key: " + int(key));
-  /*
   if (key == 44) { //,
+    driver.strip_mode = 1;
   }
   if (key == 46) { //.
+    driver.strip_mode = 2;
   }
-  if (key == 45) { //-   
+  if (key == 45) { //-  
+   driver.strip_mode = 3; 
   }
   if (key == 8) { // Backsapce
+   driver.strip_mode = 0;
   }
+  /*
   if (key == 10) { // Enter
   }       
   if (key == 103) { //g

@@ -1,6 +1,8 @@
+import processing.serial.*;
+
 class DioderDriver {
   int r, g, b;
-  int strobe;
+  int strip_mode;
   
   Serial serial;
   
@@ -12,7 +14,7 @@ class DioderDriver {
     r = 0;
     g = 0;
     b = 0;
-    strobe = 0;
+    strip_mode = 0;
     
     try {
       String portName = Serial.list()[0];
@@ -29,10 +31,10 @@ class DioderDriver {
   void update() {
     // Write to serial if connected
     if (!dummyMode) {
-      serial.write(r);
-      serial.write(g);
-      serial.write(b);
-      serial.write(0);  // DEBUG
+      serial.write(byte(r));
+      serial.write(byte(g));
+      serial.write(byte(b));
+      serial.write(byte(strip_mode));
       serial.clear();
     }
   }
