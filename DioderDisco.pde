@@ -97,11 +97,11 @@ void setup()
   parameters.set("level part", LEVEL_PART);
   parameters.set("eff fader", EFFECT_FADER);
   parameters.set("beat fader scale", BEAT_FADER_SCALE);
-  parameters.set("master level", masterLevel);
+  parameters.set("saturation", MAX_SATURATION);
   parameters.set("master red", masterLevel);
   parameters.set("master green", masterLevel);
   parameters.set("master blue", masterLevel);
-  parameters.set("saturation", MAX_SATURATION);
+  parameters.set("master level", masterLevel);
   parameters.set("strobe", STROBE);
   
   status = new FloatDict();
