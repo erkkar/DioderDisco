@@ -374,28 +374,28 @@ void controllerChange(int channel, int number, int value) {
   if (number == 7) { //C9
     parameters.set("master level", float(value) / 127);
   }
-  if (number == 5) { //C7
+  if (number == 74) { //C4
     parameters.set("beat fader scale", 2 * float(value) / 127);
   }
-  if (number == 84) { //C8
+  if (number == 72) { //C3
     parameters.set("eff fader", float(value) / 127);
   }
-  if (number == 74) { //C1
+  if (number == 84) { //C6
     masterBalance[0] = float(value) / 127;
     parameters.set("master red", float(value) / 127);
   }
-  if (number == 71) { //C2
+  if (number == 91) { //C7
     masterBalance[1] = float(value) / 127;
     parameters.set("master green", float(value) / 127);  
   }
-  if (number == 91) { //C3
+  if (number == 93) { //C8
     masterBalance[2] = float(value) / 127;  
     parameters.set("master blue", float(value) / 127);
   }
   if (number == 1) { //C17  
     parameters.set("strobe", value);
   }
-  if (number == 93) { //C4  
+  if (number == 79) { //C5  
     parameters.set("saturation", float(value) / 127);
   }
   if (number == 116) { //STOP  
@@ -407,14 +407,14 @@ void controllerChange(int channel, int number, int value) {
   if (number == 118) { //RECORD  
     if(value == 127) beatSets[activeBeatSet].flip();
   }
-  if (number == 113) { //RECYCLE  
+  if (number == 113) { //RECYCLE  C10
     if(value == 127) beatSets = readBeatConfig();
   }
-  if (number == 73) { //C5  
+  if (number == 73) { //C1  
     parameters.set("sensitivity",pow(10,float(value)/127*3));
     beat.setSensitivity((int) parameters.get("sensitivity"));
   }
-  if (number == 72) { //C6  
+  if (number == 75) { //C2  
     parameters.set("level part", float(value) / 127); 
   }
 }
