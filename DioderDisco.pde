@@ -106,7 +106,7 @@ void setup()
   
   status = new FloatDict();
   
-  size(WIDTH, HEIGHT, P2D);
+  size(500, 400, P2D);
   
   minim = new Minim(this);
   
