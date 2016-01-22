@@ -2,7 +2,9 @@ import processing.serial.*;
 
 class DioderDriver {
   int r, g, b;
-  int strip_mode;
+  int strip_r, strip_g, strip_b;
+  
+  int strip_mode, strip_pos;
   
   Serial serial;
   
@@ -14,12 +16,18 @@ class DioderDriver {
     r = 0;
     g = 0;
     b = 0;
-    strip_mode = 0;
+    strip_r = 0;
+    strip_g = 0;
+    strip_b = 0;
+    
+    strip_mode = 1;
     
     try {
       String portName = Serial.list()[0];
       println(portName);
       serial = new Serial(parent, portName, 9600);
+      serial.clear();
+      serial.buffer(6);
     } catch (Exception e) {   //gnu.io.PortInUse
       println("Dummy mode, no serial port in use!");
       dummyMode = true;
@@ -31,11 +39,17 @@ class DioderDriver {
   void update() {
     // Write to serial if connected
     if (!dummyMode) {
-      serial.write(byte(r));
-      serial.write(byte(g));
-      serial.write(byte(b));
-      serial.write(byte(strip_mode));
       serial.clear();
+      serial.write(r);
+      serial.write(g);
+      serial.write(b);
+      serial.write(strip_r);
+      serial.write(strip_g);
+      serial.write(strip_b);
+      //serial.write(strip_mode);
+      //serial.write(strip_pos);
+      
+      delay(5);
     }
   }
   
@@ -51,6 +65,9 @@ class DioderDriver {
   }
   
   void close() {
-    if (!dummyMode) serial.stop();
+    if (!dummyMode) {
+      serial.clear();
+      serial.stop();
+    }
   }
 };
