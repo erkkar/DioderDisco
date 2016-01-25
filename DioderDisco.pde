@@ -39,6 +39,7 @@ final float INTENSITY_THRESHOLD = 0.005;
 
 color masterColor;
 float[] masterRGB;
+float[] effectsRGB;
 
 color WHITE, BLACK, GREY, RED, GREEN, BLUE;
 float[] BLACK_RGB = {0, 0, 0};
@@ -57,7 +58,6 @@ final float SENSITIVITY = 100.0;
 final float LEVEL_PART = 0.5;
 final float EFFECT_FADER = 0.9;
 final float BEAT_FADER_SCALE = 1;
-final float STROBE = 0;
 final float STROBE_CONST = 1000; // Max length of period (ms)
 
 float masterLevel = 1;
@@ -102,11 +102,12 @@ void setup()
   parameters.set("master green", masterLevel);
   parameters.set("master blue", masterLevel);
   parameters.set("master level", masterLevel);
-  parameters.set("strobe", STROBE);
+  parameters.set("strip mode", 1);
+  parameters.set("strip pos", 0);
   
   status = new FloatDict();
   
-  size(WIDTH, HEIGHT, P2D);
+  size(500, 400, P2D);
   
   minim = new Minim(this);
   
@@ -167,8 +168,15 @@ void draw()
           + (1 - parameters.get("level part"));
   
   if (effects.enabled) {
-    masterRGB = effects.mixRGB();
-  } else if (beatSets[activeBeatSet].enabled) {
+    effectsRGB = effects.mixRGB();
+  } else {
+    effectsRGB = BLACK_RGB;
+  }
+  // Fade & clean effects
+  effects.fadeAll(parameters.get("eff fader"));
+  effects.clean();
+  
+  if (beatSets[activeBeatSet].enabled) {
     // Update lights
     beatSets[activeBeatSet].update(status.get("level"), parameters.get("beat fader scale"));
     // Mix master color
@@ -176,15 +184,19 @@ void draw()
   } else {
     masterRGB = BLACK_RGB;
   }  
-  // Fade & clean effects
-  effects.fadeAll(parameters.get("eff fader"));
-  effects.clean();
   
   // Scale with level settings
-  if (effects.enabled || beatSets[activeBeatSet].enabled) {
+  if (beatSets[activeBeatSet].enabled) {
     for (int i = 0; i < 3; i++) {
       masterRGB[i] = parameters.get("master level") * masterBalance[i] * masterRGB[i];
       masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
+    }
+  }
+  
+  if (effects.enabled) {
+    for (int i = 0; i < 3; i++) {
+      effectsRGB[i] = parameters.get("master level") * masterBalance[i] * effectsRGB[i];
+      effectsRGB[i] = lerp(255, effectsRGB[i], parameters.get("saturation"));
     }
   }
   
@@ -192,13 +204,17 @@ void draw()
   masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
   
   // DioderDriver
-  driver.r = byte(masterRGB[0]);
-  driver.g = byte(masterRGB[1]);
-  driver.b = byte(masterRGB[2]);
+  driver.r = int(masterRGB[0]);
+  driver.g = int(masterRGB[1]);
+  driver.b = int(masterRGB[2]);
+  driver.strip_r = int(effectsRGB[0]);
+  driver.strip_g = int(effectsRGB[1]);
+  driver.strip_b = int(effectsRGB[2]);
+  
+  driver.strip_mode = int(parameters.get("strip mode"));
+  driver.strip_pos = int(parameters.get("strip pos") * 255);
   
   driver.update();
-  
-  parameters.set("strip mode", driver.strip_mode);
   
   // Print status
   printSomeValues(MARGIN, (int) 2/3 * height, 
@@ -214,16 +230,16 @@ void draw()
 void keyPressed() {
   //println("Key: " + int(key));
   if (key == 44) { //,
-    driver.strip_mode = 1;
+    parameters.set("strip mode", 1);
   }
   if (key == 46) { //.
-    driver.strip_mode = 2;
+    parameters.set("strip mode", 2);
   }
   if (key == 45) { //-  
-   driver.strip_mode = 3; 
+   parameters.set("strip mode", 3);
   }
-  if (key == 8) { // Backsapce
-   driver.strip_mode = 0;
+  if (key == 8) { // Backspace
+   parameters.set("strip mode", 0);
   }
   /*
   if (key == 10) { // Enter
@@ -393,7 +409,7 @@ void controllerChange(int channel, int number, int value) {
     parameters.set("master blue", float(value) / 127);
   }
   if (number == 1) { //C17  
-    parameters.set("strobe", value);
+    parameters.set("strip pos", float(value) / 127);
   }
   if (number == 79) { //C5  
     parameters.set("saturation", float(value) / 127);
