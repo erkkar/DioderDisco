@@ -17,20 +17,23 @@ class LightThing
   // Constructor
   LightThing(boolean status, float fader, float hue) 
   {
-    enabled = status;
+    this.enabled = status;
     this.comment = "";
     this.fader = fader;
     this.hue = hue;
     this.saturation = MAX_SATURATION;
     this.brightness = MAX_BRIGHTNESS;
     
-    intensity = 0;
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    this.colour = color(hue, saturation, brightness);
+    
+    this.intensity = 0;
     
     calcRGB();
   }
   
   void change(float fader, float hue, float saturation, float brightness) {
-    enabled = true;
+    this.enabled = true;
     this.fader = fader;
     this.hue = hue;
     this.saturation = saturation;
@@ -40,12 +43,10 @@ class LightThing
   }
   
   void calcRGB() {
-    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
-    colour = color(hue, saturation, brightness);
     colorMode(RGB, 255);
-    R = (colour >> 16) & 0xFF;
-    G = (colour >> 8) & 0xFF;
-    B = colour & 0xFF;
+    R = (this.colour >> 16) & 0xFF;
+    G = (this.colour >> 8) & 0xFF;
+    B = this.colour & 0xFF;
   }
   
   // fade
@@ -70,9 +71,14 @@ class LightThing
   }
   
   // getColor
-  color getColor() {
+  color getRGBColor() {
     colorMode(RGB, 255); 
     return color(intensity * R, intensity * B, intensity * B); 
+  }
+  
+  color getHSBColor() {
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    return color(hue, saturation, intensity * brightness);
   }
   
   // Get original color
@@ -102,13 +108,13 @@ class BeatThing extends LightThing
   void beat(float level, float scaledFader) {
     switch(type) {
       case 'k':
-        if (beat.isKick()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isKick()) super.beat(level); else super.fade(scaledFader);
         break;
       case 's':
-        if (beat.isSnare()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isSnare()) super.beat(level); else super.fade(scaledFader);
         break;
       case 'h':
-        if (beat.isHat()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isHat()) super.beat(level); else super.fade(scaledFader);
         break;
     }
   }
