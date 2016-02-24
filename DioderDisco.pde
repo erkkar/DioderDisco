@@ -8,7 +8,7 @@ import themidibus.*;
 
 Minim        minim;
 AudioInput   in;
-BeatDetect   beat;
+BeatDetect   bd;
 BeatListener bl;
 DioderDriver driver;
 
@@ -21,7 +21,6 @@ float level;
 float mixLevel;
 float levelPart = 0.5;
 final float LEVEL_THRESHOLD = 0.005;
-
 
 // Parameters
 FloatDict parameters;
@@ -116,7 +115,7 @@ void setup()
   // a beat detection object that is FREQ_ENERGY mode that 
   // expects buffers the length of song's buffer size
   // and samples captured at songs's sample rate
-  beat = new BeatDetect(in.bufferSize(), in.sampleRate());
+  bd = new BeatDetect(in.bufferSize(), in.sampleRate());
   
   // set the sensitivity to 300 milliseconds
   // After a beat has been detected, the algorithm will wait for 300 milliseconds 
@@ -124,10 +123,10 @@ void setup()
   // algorithm if it is giving too many false-positives. The default value is 10, 
   // which is essentially no damping. If you try to set the sensitivity to a negative value, 
   // an error will be reported and it will be set to 10 instead. 
-  beat.setSensitivity((int) parameters.get("sensitivity"));
+  bd.setSensitivity((int) parameters.get("sensitivity"));
   
   // make a new beat listener, so that we won't miss any buffers for the analysis
-  bl = new BeatListener(beat, in);  
+  bl = new BeatListener(bd, in);  
   
   // Init Dioder driver
   driver = new DioderDriver(this);
@@ -428,7 +427,7 @@ void controllerChange(int channel, int number, int value) {
   }
   if (number == 73) { //C1  
     parameters.set("sensitivity",pow(10,float(value)/127*3));
-    beat.setSensitivity((int) parameters.get("sensitivity"));
+    bd.setSensitivity((int) parameters.get("sensitivity"));
   }
   if (number == 75) { //C2  
     parameters.set("level part", float(value) / 127); 

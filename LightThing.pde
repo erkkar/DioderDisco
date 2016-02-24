@@ -102,13 +102,13 @@ class BeatThing extends LightThing
   void beat(float level, float scaledFader) {
     switch(type) {
       case 'k':
-        if (beat.isKick()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isKick()) super.beat(level); else super.fade(scaledFader);
         break;
       case 's':
-        if (beat.isSnare()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isSnare()) super.beat(level); else super.fade(scaledFader);
         break;
       case 'h':
-        if (beat.isHat()) super.beat(level); else super.fade(scaledFader);
+        if (bd.isHat()) super.beat(level); else super.fade(scaledFader);
         break;
     }
   }
