@@ -21,17 +21,19 @@ class DioderDriver {
     strip_b = 0;
     
     strip_mode = 1;
-    
+
+    String portName = Serial.list()[0];
+    print("Connecting to Arduino on " + portName + "...");
     try {
-      String portName = Serial.list()[0];
-      println(portName);
       serial = new Serial(parent, portName, 9600);
       serial.clear();
-      serial.buffer(6);
+      serial.buffer(6); 
+      print("done.\n");
     } catch (Exception e) {   //gnu.io.PortInUse
+      print("fail.\n");
       println("Dummy mode, no serial port in use!");
       dummyMode = true;
-    }
+    } 
     
     update();
   }
