@@ -7,7 +7,7 @@ class LightSet
   
   // Constructor
   LightSet(int size) {
-     theSet = new LightThing[size];
+     this.theSet = new LightThing[size];
   }
   
   // mixColour
