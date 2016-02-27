@@ -31,7 +31,7 @@ void setup() {
 
   strip_mode = 1;
   strip_pos = 0;
-  old_pos = 0;
+  old_pos = -1;
 }
  
 void loop() {  
@@ -59,11 +59,8 @@ void loop() {
       stripOn(strip_r, strip_g, strip_b);
       break;
     case 2:      
-      if (strip_pos != old_pos) {
-        stripOff();
-        setPixel(int(float(strip_pos) / 255 * NLEDS), strip_r, strip_g, strip_b);
-        old_pos = strip_pos;
-      }
+      stripOff();
+      setPixel(int(float(strip_pos) / 255 * NLEDS), strip_r, strip_g, strip_b);
       break;
     default:
       stripOff();

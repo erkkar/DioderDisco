@@ -15,14 +15,13 @@ class LightThing
   float R, G, B;
   
   // Constructor
-  LightThing(boolean status, float fader, float hue) 
+  LightThing(boolean status, float fader, float hue, float brightness) 
   {
     this.enabled = status;
-    this.comment = "";
     this.fader = fader;
     this.hue = hue;
     this.saturation = MAX_SATURATION;
-    this.brightness = MAX_BRIGHTNESS;
+    this.brightness = brightness;
     
     colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
     this.colour = color(hue, saturation, brightness);
@@ -32,13 +31,36 @@ class LightThing
     calcRGB();
   }
   
+  void update() {
+  }
+  
   void change(float fader, float hue, float saturation, float brightness) {
     this.enabled = true;
     this.fader = fader;
     this.hue = hue;
     this.saturation = saturation;
     this.brightness = brightness;
-    this.intensity = brightness; 
+    this.intensity = brightness;
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    colour = color(hue, saturation, brightness);
+    calcRGB();
+  }
+  
+  void change(float fader, color colour) {
+   this.fader = fader;
+   this.colour = colour;
+   calcRGB();
+  }
+  
+  void changeHue(float hue) {
+    if (hue == 0) {
+      this.brightness = 0;
+    } else {
+      this.brightness = MAX_BRIGHTNESS;
+      this.hue = hue;
+    }
+    colorMode(HSB, MAX_HUE, MAX_SATURATION, MAX_BRIGHTNESS);
+    colour = color(hue, saturation, brightness);
     calcRGB();
   }
   
@@ -52,6 +74,10 @@ class LightThing
   // fade
   void fade(float fader) {
     intensity = constrain(intensity * fader, 0, brightness); 
+  }
+  
+  void fadeWithScale(float scaling) {
+    fade(constrain(scaling * fader, 0.01, 0.99));
   }
   
   // beat
@@ -90,33 +116,6 @@ class LightThing
   // flip
   void flip() { 
     enabled = !enabled; 
-  }
-}
-
-
-// BeatThing
-class BeatThing extends LightThing
-{
-  char type;
-  
-  // Constructor
-  BeatThing(char type, float fader, float hue) {
-    super(true, fader, hue);
-    this.type = type; 
-  }
-  
-  void beat(float level, float scaledFader) {
-    switch(type) {
-      case 'k':
-        if (bd.isKick()) super.beat(level); else super.fade(scaledFader);
-        break;
-      case 's':
-        if (bd.isSnare()) super.beat(level); else super.fade(scaledFader);
-        break;
-      case 'h':
-        if (bd.isHat()) super.beat(level); else super.fade(scaledFader);
-        break;
-    }
   }
 }
 

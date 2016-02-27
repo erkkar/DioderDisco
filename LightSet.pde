@@ -75,58 +75,93 @@ class BeatSet extends LightSet
 {
   // Constructor
   BeatSet() {
-    super(0);
-    enabled = false;
+    super(MAX_BEAT_EFFECTS);
+    theSet[0] = new LightThing(true, 0.5, 0.0, MAX_BRIGHTNESS);
+    theSet[1] = new LightThing(true, 0.5, 0.0, MAX_BRIGHTNESS);
+    theSet[2] = new LightThing(true, 0.5, 0.0, MAX_BRIGHTNESS);
+  }
+
+  //void readConfig(String filename) {
+  //  BufferedReader LTconfig = createReader(filename);
+  //  String line;
+  //  String[] config = {};
+    
+  //  // Get name on first line      
+  //  try {
+  //    line = LTconfig.readLine();
+  //  } catch (IOException e) {
+  //    line = null;
+  //  }
+  //  if (line == null || line.equals("")) return;
+  //  else name = line;
+    
+  //  // Read effect config from rest of the file
+  //  for (int i = 0; i < MAX_BEAT_EFFECTS; i += 1) {
+  //    try {
+  //      line = LTconfig.readLine();
+  //    } catch (IOException e) {
+  //      line = null;
+  //      break;
+  //    }
+  //    if (line == null || line.equals("")) break;
+      
+  //    config = splitTokens(line);
+  //    // Check correct length
+  //    if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
+      
+  //    theSet[i] = new LightThing(true, float(config[1]), float(config[2]), MAX_BRIGHTNESS);
+  //  }
+  //}
+}
+
+class MixSet extends BeatSet {
+  
+  BeatSet A;
+  BeatSet B;
+  
+  float mixA = 1;
+  
+  // Constructor
+  MixSet() {
+    super();
+    A = new BeatSet();
+    B = new BeatSet();
+  }
+
+  float[] mixRGB() {
+    
+    for (int i = 0; i < MAX_BEAT_EFFECTS; i += 1) {
+      theSet[i].change(lerp(A.theSet[i].fader, B.theSet[i].fader, 1 - mixA), 
+                       lerpColor(A.theSet[i].colour, B.theSet[i].colour, 1 - mixA));
+    }                 
+    return super.mixRGB();
   }
   
   void update(float level, float faderScaling) {
-    float scaledFader;
-    for (BeatThing lt : (BeatThing[]) theSet) {
-      scaledFader = constrain(faderScaling * lt.fader, 0.01, 0.99);
-        if ( level > LEVEL_THRESHOLD ) {
-          lt.beat(level, scaledFader);
-        } else {
-          lt.fade(scaledFader); 
-        }  
-     }
+    boolean levelCheck = level > LEVEL_THRESHOLD;
+    if (levelCheck && bd.isKick())  theSet[0].beat(level); else theSet[0].fadeWithScale(faderScaling);
+    if (levelCheck && bd.isSnare()) theSet[1].beat(level); else theSet[1].fadeWithScale(faderScaling);
+    if (levelCheck && bd.isHat())   theSet[2].beat(level); else theSet[2].fadeWithScale(faderScaling);
   }
-
-  void readConfig(String filename) {
-    theSet = new BeatThing[0];
-    BufferedReader LTconfig = createReader(filename);
-    String line;
-    String[] config = {};
-    char type;
-    
-    // Get name on first line      
-    try {
-      line = LTconfig.readLine();
-    } catch (IOException e) {
-      line = null;
-    }
-    if (line == null || line.equals("")) return;
-    else name = line;
-    
-    // Read effect config from rest of the file
-    while (true) {
-      try {
-        line = LTconfig.readLine();
-      } catch (IOException e) {
-        line = null;
-        break;
-      }
-      if (line == null || line.equals("")) break;
-      
-      config = splitTokens(line);
-      // Check correct length
-      if (config.length != LTS_CONFIG_LINE_TOKENS) continue; 
-      
-      type = config[0].charAt(0);
-      theSet = (BeatThing[]) append(theSet, new BeatThing(type, float(config[1]), float(config[2])));
+  
+  void changeHue(char set, int number, float hue) { //<>// //<>//
+    if (set == 'A') {
+      A.theSet[number].changeHue(hue);
+    } else {
+      B.theSet[number].changeHue(hue);
     }
   }
+  
+  void changeFader(char set, int number, float fader) {
+    if (set == 'A') {
+      A.theSet[number].fader = fader;
+    } else {
+      B.theSet[number].fader = fader;
+    }
+  }
+  
+// End of MixSet
 }
-
 
 
 // EffectSet
@@ -136,7 +171,7 @@ class EffectSet extends LightSet
   EffectSet(int size) {
     super(size);
     for (int i = 0; i < size; i++) {
-      theSet[i] = new LightThing(false, EFFECT_FADER, 0);
+      theSet[i] = new LightThing(false, EFFECT_FADER, 0, MAX_BRIGHTNESS);
     }
   }
   

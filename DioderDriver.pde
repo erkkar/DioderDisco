@@ -22,7 +22,12 @@ class DioderDriver {
     
     strip_mode = 1;
 
-    String portName = Serial.list()[0];
+    String portName;
+    try {
+      portName = Serial.list()[0];
+    } catch (Exception e) {
+      portName = "";
+    }
     print("Connecting to Arduino on " + portName + "...");
     try {
       serial = new Serial(parent, portName, 9600);
