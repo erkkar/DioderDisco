@@ -3,8 +3,9 @@ import opendmx.*;
 class DmxDriver {
   
   int r, g, b;
+  int level;
   
-  private int SIZE = 3;
+  private int SIZE = 4;
   private byte[] data = new byte[SIZE];
   
   OpenDmx openDmx = null;
@@ -23,6 +24,7 @@ class DmxDriver {
   r = 0;
   g = 0;
   b = 0;
+  level = 0;
 
   update();
 }
@@ -32,7 +34,12 @@ void update() {
   data[0] = byte(r);
   data[1] = byte(g);
   data[2] = byte(b);
+  data[3] = byte(level);
   openDmx.sendData(data, SIZE);
+}
+
+void setLevel(float fraction) {
+  level = int(fraction * 255);
 }
 
 void close() {

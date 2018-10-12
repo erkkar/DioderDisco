@@ -135,7 +135,7 @@ void setup()
   bl = new BeatListener(bd, in);  
   
   // Init Dioder driver
-  driver = new DioderDriver(this, "COMX");
+  driver = new DioderDriver(this, "COM4");
   
   // Init DMX driver
   quad_spot = new DmxDriver(0);
@@ -203,7 +203,7 @@ void draw()
   
   if (effects.enabled) {
     for (int i = 0; i < 3; i++) {
-      effectsRGB[i] = parameters.get("master level") * effectsRGB[i];
+      effectsRGB[i] = effectsRGB[i];
       effectsRGB[i] = lerp(255, effectsRGB[i], parameters.get("saturation"));
     }
   }
@@ -218,6 +218,7 @@ void draw()
   quad_spot.r = int(effectsRGB[0]);
   quad_spot.g = int(effectsRGB[1]);
   quad_spot.b = int(effectsRGB[2]);
+  quad_spot.setLevel(parameters.get("master level"));
   
   driver.strip_mode = int(parameters.get("strip mode"));
   driver.strip_pos = int(parameters.get("strip pos") * 255);
