@@ -13,6 +13,7 @@ AudioInput   in;
 BeatDetect   bd;
 BeatListener bl;
 DioderDriver driver;
+DmxDriver    quad_spot; 
 
 // Beats and effects
 BeatSet[] beatSets;
@@ -134,7 +135,10 @@ void setup()
   bl = new BeatListener(bd, in);  
   
   // Init Dioder driver
-  driver = new DioderDriver(this);
+  driver = new DioderDriver(this, "COMX");
+  
+  // Init DMX driver
+  quad_spot = new DmxDriver(0);
    
   //=================================
   // Init LightThings
@@ -211,14 +215,15 @@ void draw()
   driver.r = int(masterRGB[0]);
   driver.g = int(masterRGB[1]);
   driver.b = int(masterRGB[2]);
-  driver.strip_r = int(effectsRGB[0]);
-  driver.strip_g = int(effectsRGB[1]);
-  driver.strip_b = int(effectsRGB[2]);
+  quad_spot.r = int(effectsRGB[0]);
+  quad_spot.g = int(effectsRGB[1]);
+  quad_spot.b = int(effectsRGB[2]);
   
   driver.strip_mode = int(parameters.get("strip mode"));
   driver.strip_pos = int(parameters.get("strip pos") * 255);
   
   driver.update();
+  quad_spot.update();
   
   // Print status
   printSomeValues(MARGIN, (int) 2/3 * height, 
@@ -376,6 +381,9 @@ void exit()
   // Switch lights off
   driver.update(BLACK);
   driver.close();
+  
+  // Close DMX
+  quad_spot.close();
   
   // always close Minim audio classes when you are finished with them
   in.close();

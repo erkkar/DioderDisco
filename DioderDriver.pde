@@ -10,7 +10,7 @@ class DioderDriver {
   
   boolean dummyMode;
   
-  DioderDriver(PApplet parent) {
+  DioderDriver(PApplet parent, String portName) {
     dummyMode = (parent == null);
     
     r = 0;
@@ -22,12 +22,6 @@ class DioderDriver {
     
     strip_mode = 1;
 
-    String portName;
-    try {
-      portName = Serial.list()[0];
-    } catch (Exception e) {
-      portName = "";
-    }
     print("Connecting to Arduino on " + portName + "...");
     try {
       serial = new Serial(parent, portName, 9600);
