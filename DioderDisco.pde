@@ -196,14 +196,14 @@ void draw()
   // Scale with level settings
   if (beatsOn) {
     for (int i = 0; i < 3; i++) {
-      masterRGB[i] = parameters.get("master level") * masterRGB[i];
+      masterRGB[i] = masterRGB[i];
       masterRGB[i] = lerp(255, masterRGB[i], parameters.get("saturation"));
     }
   }
   
   if (effects.enabled) {
     for (int i = 0; i < 3; i++) {
-      effectsRGB[i] = effectsRGB[i];
+      effectsRGB[i] = parameters.get("master level") * effectsRGB[i];
       effectsRGB[i] = lerp(255, effectsRGB[i], parameters.get("saturation"));
     }
   }
@@ -211,14 +211,16 @@ void draw()
   colorMode(RGB, 255);
   masterColor = color(masterRGB[0], masterRGB[1], masterRGB[2]);
   
-  // DioderDriver
-  driver.r = int(masterRGB[0]);
-  driver.g = int(masterRGB[1]);
-  driver.b = int(masterRGB[2]);
-  quad_spot.r = int(effectsRGB[0]);
-  quad_spot.g = int(effectsRGB[1]);
-  quad_spot.b = int(effectsRGB[2]);
+  // DMX driver
+  quad_spot.r = int(masterRGB[0]);
+  quad_spot.g = int(masterRGB[1]);
+  quad_spot.b = int(masterRGB[2]);
   quad_spot.setLevel(parameters.get("master level"));
+
+  // Dioder driver
+  driver.r = int(effectsRGB[0]);
+  driver.g = int(effectsRGB[1]);
+  driver.b = int(effectsRGB[2]);
   
   driver.strip_mode = int(parameters.get("strip mode"));
   driver.strip_pos = int(parameters.get("strip pos") * 255);
